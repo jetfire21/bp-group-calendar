@@ -1200,39 +1200,6 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 			<?php echo $edit_link; ?>
 		</h4>
 
-		<?php
-		/**** a21_display******/
-		$event_image = $wpdb->get_var( "SELECT meta_value FROM {$wpdb->prefix}bp_groups_groupmeta WHERE group_id='{$event_id}' AND meta_key='a21_bgc_event_image'");
-		$event_tasks = $wpdb->get_var( "SELECT meta_value FROM {$wpdb->prefix}bp_groups_groupmeta WHERE group_id='{$event_id}' AND meta_key='a21_bgc_event_tasks'");
-		$event_tasks = unserialize($event_tasks);
-
-		if($event_image) {?> <img src="<?php echo $event_image;?>" alt=""><?php }
-		alex_debug(0,1,"",$event_tasks);
-		$need = " Needed";
-		if( !empty($event_tasks)):
-			echo $event_tasks['total-volunteers'].$need;
-			unset($event_tasks['total-volunteers']);
-		 ?>
-			<table id="a21_bgc_tasks_shifts">
-			<tr>
-				<th>Task item</th>
-				<th>SHIFT #1 (edit time details)</th>
-				<th>SHIFT #2 (edit time details)</th>
-			</tr>
-		<?php
-			foreach ($event_tasks as $v):
-				echo "<tr>";
-				echo "<td>".$v['task']."</td>";
-				echo "<td>".$v['shift_1']."</td>";
-				echo "<td>".$v['shift_2']."</td>";
-				echo "</tr>";
-			endforeach;
-			echo "</table>";
-		endif;
-		alex_debug(0,1,"",$event_tasks);
-		 /**** a21 ******/ 
-		?>
-
 		<h5 class="events-title"><?php echo stripslashes( $event->event_title ); ?></h5>
 		<span
 			class="activity"><?php echo bgc_date_display( $event->event_time, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) ); ?></span>
@@ -1258,6 +1225,40 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 				<?php endif; ?>
 			</div>
 		<?php endif; ?>
+
+		<?php
+		/**** a21_display******/
+		$event_image = $wpdb->get_var( "SELECT meta_value FROM {$wpdb->prefix}bp_groups_groupmeta WHERE group_id='{$event_id}' AND meta_key='a21_bgc_event_image'");
+		$event_tasks = $wpdb->get_var( "SELECT meta_value FROM {$wpdb->prefix}bp_groups_groupmeta WHERE group_id='{$event_id}' AND meta_key='a21_bgc_event_tasks'");
+		$event_tasks = unserialize($event_tasks);
+
+		if($event_image) {?> <img src="<?php echo $event_image;?>" alt=""><?php }
+		// alex_debug(0,1,"",$event_tasks);
+		$need = " Needed";
+		if( !empty($event_tasks)):
+			echo '<h6 class="event-label">Total Event Volunteers Needed:</h6>'.$event_tasks['total-volunteers'].$need;
+			unset($event_tasks['total-volunteers']);
+		 ?>
+			 <h6 class="event-label">Event Tasks & Shifts:</h6>
+			<table id="a21_bgc_tasks_shifts">
+			<tr>
+				<th>Task item</th>
+				<th>SHIFT #1 (edit time details)</th>
+				<th>SHIFT #2 (edit time details)</th>
+			</tr>
+		<?php
+			foreach ($event_tasks as $v):
+				echo "<tr>";
+				echo "<td>".$v['task']."</td>";
+				echo "<td>".$v['shift_1'].$need."</td>";
+				echo "<td>".$v['shift_2'].$need."</td>";
+				echo "</tr>";
+			endforeach;
+			echo "</table>";
+		endif;
+		// alex_debug(0,1,"",$event_tasks);
+		 /**** a21 ******/ 
+		?>
 
 		<?php echo $event_meta; ?>
 
@@ -1344,13 +1345,16 @@ function bp_group_calendar_widget_create_event( $date ) {
 			<?php /**** a21 ******/?>
 			<label for="a21_image_upload"><?php _e( 'Event image', 'groupcalendar' ); ?> </label>
 			<input type="file" name="a21_image_upload" id="a21_image_upload" />
+			<br>
+			<br>
+			<h4><?php _e( 'Create Schedule', 'groupcalendar' ); ?></h4>
 
 			<label for="total-volunteers"><?php _e( 'Total Event Volunteers Needed', 'groupcalendar' ); ?></label>
 			<input name="total-volunteers" id="total-volunteers" value="" type="text">
 
 			<label for="event_tasks"><?php _e( 'Event Tasks & Shifts', 'groupcalendar' ); ?></label>
 			<!-- <input name="event_tasks" id="event_tasks" value="" type="text"> -->
-			<table id="a21_bgc_tasks_shifts">
+			<table id="a21_bgc_tasks_shifts" style="margin-bottom: 5px;">
 			<tr>
 				<th>Task item</th>
 				<th>SHIFT #1 (edit time details)</th>
@@ -1363,9 +1367,9 @@ function bp_group_calendar_widget_create_event( $date ) {
 				<td>3 Needed</td>
 			</tr>
 -->
-			<div id="a21_bgc_add_new_row">+ Add New Task</div>
 			</table>
-
+			<div id="a21_bgc_add_new_row" style="cursor: pointer;">+ Add New Task</div>
+			<br>
 			<label for="thank_you"><?php _e( 'Event Completion Thank-you Message', 'groupcalendar' ); ?></label>
 			<input name="thank_you" id="thank_you" value="" type="text">
 			<?php /**** a21 ******/?>
