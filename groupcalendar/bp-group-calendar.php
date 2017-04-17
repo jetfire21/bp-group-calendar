@@ -243,6 +243,16 @@ function bp_group_calendar_event_save() {
 	$calendar_capabilities = bp_group_calendar_get_capabilities();
 
 	if ( isset( $_POST['create-event'] ) ) {
+
+		/**** a21 ******/
+		
+		// alex_debug(1,1,"",$_REQUEST);
+		// alex_debug(1,1,"",$_FILES);
+
+		// exit("bp_group_calendar_event_save()");
+
+		/**** a21 ******/
+
 		if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'bp_group_calendar' ) ) {
 			bp_core_add_message( __( 'There was a security problem', 'groupcalendar' ), 'error' );
 
@@ -335,6 +345,34 @@ function bp_group_calendar_event_save() {
 
 				return false;
 			}
+
+			/**** a21 ******/
+			if ( ! function_exists( 'wp_handle_upload' ) ) {
+			    require_once( ABSPATH . 'wp-admin/includes/file.php' );
+			}
+
+			$uploadedfile = $_FILES['a21_image_upload'];
+
+			$upload_overrides = array( 'test_form' => false );
+
+			// $movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
+			$mimes = array('png' => 'image/png','gif'=> 'image/gif','jpg'=> 'image/jpeg');
+			$movefile = wp_handle_upload($uploadedfile, array('test_form' => false, 'mimes' => $mimes));
+
+			if ( $movefile && ! isset( $movefile['error'] ) ) {
+			    // echo "File is valid, and was successfully uploaded.\n";
+			    // echo "<hr>".$movefile['url']."<hr>";
+			    // var_dump( $movefile );
+			    $group_id    = (int) $_POST['group-id'];
+				$query = $wpdb->prepare( "INSERT INTO " . $wpdb->base_prefix . "bp_groups_groupmeta
+			                	( group_id,meta_key,meta_value)
+			                	VALUES ( %d,%s, %s )", $group_id, 'a21_bgc_event_image',$movefile['url'] );
+				$wpdb->query( $query );
+
+			} else {
+			    // echo $movefile['error'];
+			}
+			/**** a21 ******/
 
 		}
 
@@ -1109,6 +1147,13 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 			<?php echo $edit_link; ?>
 		</h4>
 
+		<?php
+		/**** a21 ******/
+			$event_image = $wpdb->get_var( "SELECT meta_value FROM {$wpdb->prefix}bp_groups_groupmeta WHERE group_id='{$group_id}' AND meta_key='a21_bgc_event_image'");
+		?>
+		<img src="<?php echo $event_image;?>" alt="">
+		/**** a21 ******/
+
 		<h5 class="events-title"><?php echo stripslashes( $event->event_title ); ?></h5>
 		<span
 			class="activity"><?php echo bgc_date_display( $event->event_time, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) ); ?></span>
@@ -1172,6 +1217,9 @@ function bp_group_calendar_widget_create_event( $date ) {
 			<label for="event-title"><?php _e( 'Title', 'groupcalendar' ); ?> *</label>
 			<input name="event-title" id="event-title" value="" type="text">
 
+			<label for="a21_image_upload"><?php _e( 'Image', 'groupcalendar' ); ?> </label>
+			<input type="file" name="a21_image_upload" id="a21_image_upload" />
+
 			<label for="event-date"><?php _e( 'Date', 'groupcalendar' ); ?> *
 				<input name="event-date" id="event-date" value="<?php echo $default_date; ?>" type="text"></label>
 
@@ -1221,7 +1269,7 @@ function bp_group_calendar_widget_create_event( $date ) {
 				<input name="event-map" id="event-map" value="1" type="checkbox" checked="checked"/>
 				<small><?php _e( '(Note: Location must be an address)', 'groupcalendar' ); ?></small>
 			</label>
-
+				
 			<input name="create-event" id="create-event" value="1" type="hidden">
 			<input name="group-id" id="group-id" value="<?php echo $bp->groups->current_group->id; ?>" type="hidden">
 			<?php wp_nonce_field( 'bp_group_calendar' ); ?>
