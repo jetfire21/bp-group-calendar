@@ -122,6 +122,14 @@ if ( class_exists( 'BP_Group_Extension' ) ) {
 			global $bp;
 			$event_id = bp_group_calendar_event_url_parse();
 
+			/**** a21 display()******/
+			// echo '===MAIN======a21 display()';
+			// echo "<br>";
+			// var_dump($event_id);
+			// exit;
+			/**** a21 display()******/
+
+
 			$edit_event = bp_group_calendar_event_is_edit();
 
 			bp_group_calendar_event_is_delete();
@@ -628,24 +636,59 @@ function bp_group_calendar_url_parse() {
 function bp_group_calendar_event_url_parse() {
 
 	$url = $_SERVER['REQUEST_URI'];
-	if ( strpos( "/calendar/event/", $url ) !== false ) {
-		return false;
-	}
+	$full_url = $url; // a21
+	// if ( strpos( "/calendar/event/", $url ) !== false ) {
+	// 	return false;
+	// }
+
+	/**** a21 ******/
+	// echo 'strpos( "/calendar/event/", $url )= ';
+	// var_dump(strpos( "/calendar/event/", $url ));
+	// echo "<br>";
+	// echo 'strpos( $url, "/calendar/event/")=';
+	// var_dump(strpos( $url, "/calendar/event/"));
+	// echo "<br>";
+	// echo $url;
+	// echo "<br>";
+	/**** a21 ******/
 
 	$url_clean    = explode( "?", $url );
 	$url          = $url_clean[0];
 	$url_sections = explode( "/calendar/event/", $url );
 	$url          = isset( $url_sections[1] ) ? $url_sections[1] : '';
 	$url          = ltrim( $url, "/" );
+	$slug          = rtrim( $url, "/" ); // a21
 	$url          = rtrim( $url, "edit/" );
 	$url          = rtrim( $url, "delete/" );
 	$url          = rtrim( $url, "/" );
+
+
+	/**** a21 ******/
+	// echo "<br><br>";
+	// echo "=after parsing url: ";
+	// echo $url;
+	// echo "<br>";
+	// echo $slug;
+	// echo "<br>";
+	if ( strpos( $full_url,"/calendar/event/" ) !== false ) {
+		// echo "======================";
+		global $wpdb;
+		$url = $wpdb->get_var( "SELECT id FROM {$wpdb->prefix}bp_groups_calendars WHERE event_slug='{$slug}'");
+		// echo "get id form bd ".$slug;
+	}
+	// echo "<br>";
+	// echo $url;
+	// echo "<br>";
+	// echo strpos( "/calendar/event/",$url);
+	/**** a21 ******/
+
 
 	if ( is_numeric( $url ) ) {
 		return (int) $url;
 	} else {
 		return false;
 	}
+
 
 }
 
@@ -718,10 +761,21 @@ function bp_group_calendar_event_is_delete() {
 
 
 function bp_group_calendar_create_event_url( $event_id, $edit = false ) {
-	global $bp;
+	global $bp,$wpdb;
 
 	$url = bp_get_group_permalink( $bp->groups->current_group );
-	$url .= 'calendar/event/' . $event_id . '/';
+	/***** a21 ******/
+	// echo "====event_id=".$event_id;
+	$event_title = $wpdb->get_var( "SELECT event_title FROM {$wpdb->prefix}bp_groups_calendars WHERE id='{$event_id}'");
+	$event_title = strtolower($event_title);
+	$event_title = str_replace(" ", "_", $event_title);
+	// echo "<br><br>bp_group_calendar_create_event_url<br>";
+	$url .= 'calendar/event/' . $event_title . '/';
+	// echo $url .= 'calendar/event/' . $event_id . '/';
+	// exit;
+	/***** a21 ******/
+
+	// $url .= 'calendar/event/' . $event_id . '/';
 
 	if ( $edit ) {
 		$url .= "edit/";
@@ -730,6 +784,27 @@ function bp_group_calendar_create_event_url( $event_id, $edit = false ) {
 	return $url;
 
 }
+// function a21_bp_group_calendar_create_event_url( $event_id, $edit = false ) {
+// 	global $bp,$wpdb;
+
+// 	$url = bp_get_group_permalink( $bp->groups->current_group );
+// 	/***** a21 ******/
+// 	$event_title = $wpdb->get_var( "SELECT event_title FROM {$wpdb->prefix}bp_groups_calendars` WHERE id='{$event_id}'");
+// 	$event_title = strtolower($event_title);
+// 	$event_title = str_replace(" ", "_", $event_title);
+
+// 	$url .= 'calendar/event/' . $event_title . '/';
+// 	/***** a21 ******/
+
+// 	// $url .= 'calendar/event/' . $event_id . '/';
+
+// 	if ( $edit ) {
+// 		$url .= "edit/";
+// 	}
+
+// 	return $url;
+
+// }
 
 //------------------------------------------------------------------------//
 
@@ -970,7 +1045,7 @@ function bp_group_calendar_list_events( $group_id, $range, $date = '', $calendar
 
 			$events_list .= "\n<li" . $class . ">";
 
-			$events_list .= '<a href="' . bp_group_calendar_create_event_url( $event->id ) . '" title="' . __( 'View Event', 'groupcalendar' ) . '" class="event_title">' . bgc_date_display( $event->event_time, $date_format ) . ': ' . stripslashes( $event->event_title ) . '</a>';
+			$events_list .= '<a href="' . bp_group_calendar_create_event_url( $event->id ) . '" title="'. __( 'View Event', 'groupcalendar' ) . '" class="event_title">' . bgc_date_display( $event->event_time, $date_format ) . ': ' . stripslashes( $event->event_title ) .'</a>';
 
 			//add edit link if allowed
 			if ( $calendar_capabilities == 'full' || ( $calendar_capabilities == 'limited' && $event->user_id == $current_user->ID ) ) {
@@ -1174,6 +1249,14 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 	$event = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM " . $wpdb->base_prefix . "bp_groups_calendars WHERE group_id = %d AND id = %d", $group_id, $event_id ) );
 
+	/****** a21 event details*******/
+	// var_dump($bgc_locale);
+	// echo 'bp_group_calendar_widget_event_display()';
+	// echo "<br>";
+	// echo "event id=".$event_id;
+	// exit;
+	/****** a21 event details*******/
+
 	//do nothing if invalid event_id
 	if ( ! $event ) {
 		return;
@@ -1343,6 +1426,10 @@ function bp_group_calendar_widget_create_event( $date ) {
 			<input name="event-loc" id="event-loc" value="" type="text">
 			
 			<?php /**** a21 ******/?>
+			<?php
+			 // global $wp_rewrite;
+			 // alex_debug(1,1,"",$wp_rewrite);
+			?>
 			<label for="a21_image_upload"><?php _e( 'Event image', 'groupcalendar' ); ?> </label>
 			<input type="file" name="a21_image_upload" id="a21_image_upload" />
 			<br>
