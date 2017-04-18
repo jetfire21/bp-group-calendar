@@ -393,23 +393,23 @@ function bp_group_calendar_event_save() {
 				    // echo $movefile['error'];
 				}
 
-				if( !empty( $_POST['new_event_tasks']) ){
+				// if( !empty( $_POST['new_event_tasks']) ){
 
-					if(!empty($_POST['total-volunteers'])) $_POST['new_event_tasks']['total-volunteers'] = $_POST['total-volunteers'];
-					$ser_str = serialize($_POST['new_event_tasks']);
-					// alex_debug(0,1,"",unserialize($ser));
-					$query = $wpdb->prepare( "INSERT INTO " . $wpdb->prefix . "bp_groups_groupmeta
-						( group_id,meta_key,meta_value)
-						VALUES ( %d,%s, %s )", $new_id, 'a21_bgc_event_tasks',$ser_str );
-					$wpdb->query( $query );
+				// 	if(!empty($_POST['total-volunteers'])) $_POST['new_event_tasks']['total-volunteers'] = $_POST['total-volunteers'];
+				// 	$ser_str = serialize($_POST['new_event_tasks']);
+				// 	// alex_debug(0,1,"",unserialize($ser));
+				// 	$query = $wpdb->prepare( "INSERT INTO " . $wpdb->prefix . "bp_groups_groupmeta
+				// 		( group_id,meta_key,meta_value)
+				// 		VALUES ( %d,%s, %s )", $new_id, 'a21_bgc_event_tasks',$ser_str );
+				// 	$wpdb->query( $query );
 
-				}
-				if(!empty($_POST['thank_you'])) {
-					$query = $wpdb->prepare( "INSERT INTO " . $wpdb->prefix . "bp_groups_groupmeta
-						( group_id,meta_key,meta_value)
-						VALUES ( %d,%s, %s )", $new_id, 'a21_bgc_event_thank_you',$_POST['thank_you'] );
-					$wpdb->query( $query );
-				}
+				// }
+				// if(!empty($_POST['thank_you'])) {
+				// 	$query = $wpdb->prepare( "INSERT INTO " . $wpdb->prefix . "bp_groups_groupmeta
+				// 		( group_id,meta_key,meta_value)
+				// 		VALUES ( %d,%s, %s )", $new_id, 'a21_bgc_event_thank_you',$_POST['thank_you'] );
+				// 	$wpdb->query( $query );
+				// }
 				// if(!empty($_POST['total-volunteers'])) {
 				// 	$query = $wpdb->prepare( "INSERT INTO " . $wpdb->prefix . "bp_groups_groupmeta
 				// 		( group_id,meta_key,meta_value)
@@ -1355,10 +1355,10 @@ function bp_group_calendar_widget_create_event( $date ) {
 			<label for="event_tasks"><?php _e( 'Event Tasks & Shifts', 'groupcalendar' ); ?></label>
 			<!-- <input name="event_tasks" id="event_tasks" value="" type="text"> -->
 			<table id="a21_bgc_tasks_shifts" style="margin-bottom: 5px;">
-			<tr>
+			<tr class="title_columns">
 				<th>Task item</th>
-				<th>SHIFT #1 (edit time details)</th>
-				<th>SHIFT #2 (edit time details)</th>
+				<!-- <th>SHIFT #1 (edit time details)</th> -->
+				<!-- <th>SHIFT #2 (edit time details)</th> -->
 			</tr>
 <!--
 			<tr>
@@ -1368,10 +1368,12 @@ function bp_group_calendar_widget_create_event( $date ) {
 			</tr>
 -->
 			</table>
-			<div id="a21_bgc_add_new_row" style="cursor: pointer;">+ Add New Task</div>
+			<div id="a21_bgc_add_new_row" style="cursor: pointer;">+ Add New Row</div>
+			<div id="a21_bgc_add_new_column" style="cursor: pointer;">+ Add New Column</div>
 			<br>
 			<label for="thank_you"><?php _e( 'Event Completion Thank-you Message', 'groupcalendar' ); ?></label>
-			<input name="thank_you" id="thank_you" value="" type="text">
+			<!-- <input name="thank_you" id="thank_you" value="" type="text"> -->
+			<textarea name="thank_you" id="thank_you" cols="30" rows="10"></textarea>
 			<?php /**** a21 ******/?>
 
 			<label for="event-map"><?php _e( 'Show Map Link?', 'groupcalendar' ); ?>
