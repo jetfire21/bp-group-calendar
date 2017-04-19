@@ -122,14 +122,6 @@ if ( class_exists( 'BP_Group_Extension' ) ) {
 			global $bp;
 			$event_id = bp_group_calendar_event_url_parse();
 
-			/**** a21 display()******/
-			// echo '===MAIN======a21 display()';
-			// echo "<br>";
-			// var_dump($event_id);
-			// exit;
-			/**** a21 display()******/
-
-
 			$edit_event = bp_group_calendar_event_is_edit();
 
 			bp_group_calendar_event_is_delete();
@@ -141,6 +133,14 @@ if ( class_exists( 'BP_Group_Extension' ) ) {
 			$date = bp_group_calendar_url_parse();
 
 			do_action( 'template_notices' );
+
+			/**** a21 display()******/
+			// echo '===MAIN======a21 display()';
+			// echo "<br>";
+			// var_dump($event_id);
+			// exit;
+			// var_dump($edit_event);
+			/**** a21 display()******/
 
 			if ( $edit_event ) {
 
@@ -670,7 +670,7 @@ function bp_group_calendar_event_url_parse() {
 	// echo "<br>";
 	// echo $slug;
 	// echo "<br>";
-	if ( strpos( $full_url,"/calendar/event/" ) !== false ) {
+	if ( strpos( $full_url,"/calendar/event/" ) !== false && strpos( $full_url,"/edit/" ) === false ) {
 		// echo "======================";
 		global $wpdb;
 		$url = $wpdb->get_var( "SELECT id FROM {$wpdb->prefix}bp_groups_calendars WHERE event_slug='{$slug}'");
@@ -766,12 +766,15 @@ function bp_group_calendar_create_event_url( $event_id, $edit = false ) {
 	$url = bp_get_group_permalink( $bp->groups->current_group );
 	/***** a21 ******/
 	// echo "====event_id=".$event_id;
-	$event_title = $wpdb->get_var( "SELECT event_title FROM {$wpdb->prefix}bp_groups_calendars WHERE id='{$event_id}'");
-	$event_title = strtolower($event_title);
-	$event_title = str_replace(" ", "_", $event_title);
-	// echo "<br><br>bp_group_calendar_create_event_url<br>";
-	$url .= 'calendar/event/' . $event_title . '/';
-	// echo $url .= 'calendar/event/' . $event_id . '/';
+	if(!$edit){
+		$event_title = $wpdb->get_var( "SELECT event_title FROM {$wpdb->prefix}bp_groups_calendars WHERE id='{$event_id}'");
+		$event_title = strtolower($event_title);
+		$event_title = str_replace(" ", "_", $event_title);
+		// echo "<br><br>bp_group_calendar_create_event_url<br>";
+		$url .= 'calendar/event/' . $event_title . '/';
+	}else{
+		$url .= 'calendar/event/' . $event_id . '/';
+	}
 	// exit;
 	/***** a21 ******/
 
@@ -1250,7 +1253,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 	$event = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM " . $wpdb->base_prefix . "bp_groups_calendars WHERE group_id = %d AND id = %d", $group_id, $event_id ) );
 
 	/****** a21 event details*******/
-	
+
 	// var_dump($bgc_locale);
 	// echo 'bp_group_calendar_widget_event_display()';
 	// echo "<br>";
@@ -1498,6 +1501,10 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 
 		return false;
 	}
+
+	/**** a21 ******/
+	// echo 'bp_group_calendar_widget_edit_event()===id '.$event_id;
+	/**** a21 ******/
 
 	if ( $event_id ) { //load from DB
 
