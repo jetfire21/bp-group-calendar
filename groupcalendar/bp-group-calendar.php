@@ -110,7 +110,7 @@ if ( class_exists( 'BP_Group_Extension' ) ) {
 			global $bp;
 
 			$this->name            = __( 'Calendar', 'groupcalendar' );
-			$this->slug            = 'calendar';
+			$this->slug            = 'huddle';
 			$this->enable_nav_item = isset( $bp->groups->current_group->user_has_access ) ? $bp->groups->current_group->user_has_access : false;
 
 			//$this->create_step_position = 21;
@@ -314,11 +314,13 @@ function bp_group_calendar_event_save() {
 					return false;
 				}
 			}
+			$event_slug = strtolower($event_title);
+			$event_slug = str_replace(" ", "-", $event_slug);
 
 			$query = $wpdb->prepare( "UPDATE " . $wpdb->base_prefix . "bp_groups_calendars
-                            	SET event_time = %s, event_title = %s, event_description = %s, event_location = %s, event_map = %d, last_edited_id = %d, last_edited_stamp = %d
+                            	SET event_time = %s,event_slug = %s, event_title = %s, event_description = %s, event_location = %s, event_map = %d, last_edited_id = %d, last_edited_stamp = %d
                             	WHERE id = %d AND group_id = %d LIMIT 1",
-				$event_date, $event_title, $event_description, $event_location, $event_map, $current_user->ID, current_time( 'timestamp', true ), (int) $_POST['event-id'], $group_id );
+				$event_date, $event_slug, $event_title, $event_description, $event_location, $event_map, $current_user->ID, current_time( 'timestamp', true ), (int) $_POST['event-id'], $group_id );
 
 			if ( $wpdb->query( $query ) ) {
 				bp_core_add_message( __( "Event saved", 'groupcalendar' ) );
@@ -362,11 +364,13 @@ function bp_group_calendar_event_save() {
 			}
 
 		} else { //new event
+			$event_slug = strtolower($event_title);
+			$event_slug = str_replace(" ", "-", $event_slug);
 
 			$query = $wpdb->prepare( "INSERT INTO " . $wpdb->base_prefix . "bp_groups_calendars
-                            	( group_id, user_id, event_time, event_title, event_description, event_location, event_map, created_stamp, last_edited_id, last_edited_stamp )
-                            	VALUES ( %d, %d, %s, %s, %s, %s, %d, %d, %d, %d )",
-				$group_id, $current_user->ID, $event_date, $event_title, $event_description, $event_location, $event_map, current_time( 'timestamp', true ), $current_user->ID, time() );
+                            	( group_id, user_id, event_time, event_slug, event_title, event_description, event_location, event_map, created_stamp, last_edited_id, last_edited_stamp )
+                            	VALUES ( %d, %d, %s, %s, %s, %s, %s, %d, %d, %d, %d )",
+				$group_id, $current_user->ID, $event_date, $event_slug, $event_title, $event_description, $event_location, $event_map, current_time( 'timestamp', true ), $current_user->ID, time() );
 
 			if ( $wpdb->query( $query ) ) {
 				$new_id = $wpdb->insert_id;
@@ -592,7 +596,7 @@ function bp_group_calendar_url_parse() {
 
 	$calendar_url = $calendar_url_clean[0];
 
-	$calendar_url_sections = explode( "/calendar/", $calendar_url );
+	$calendar_url_sections = explode( "/huddle/", $calendar_url );
 
 	$calendar_url = $calendar_url_sections[1];
 
@@ -600,7 +604,7 @@ function bp_group_calendar_url_parse() {
 
 	$calendar_url = rtrim( $calendar_url, "/" );
 
-	$base = $calendar_url_sections[0] . '/calendar/';
+	$base = $calendar_url_sections[0] . '/huddle/';
 
 	$base = ltrim( $base, "/" );
 
@@ -654,7 +658,7 @@ function bp_group_calendar_event_url_parse() {
 
 	$url_clean    = explode( "?", $url );
 	$url          = $url_clean[0];
-	$url_sections = explode( "/calendar/event/", $url );
+	$url_sections = explode( "/huddle/event/", $url );
 	$url          = isset( $url_sections[1] ) ? $url_sections[1] : '';
 	$url          = ltrim( $url, "/" );
 	$slug          = rtrim( $url, "/" ); // a21
@@ -670,7 +674,7 @@ function bp_group_calendar_event_url_parse() {
 	// echo "<br>";
 	// echo $slug;
 	// echo "<br>";
-	if ( strpos( $full_url,"/calendar/event/" ) !== false && strpos( $full_url,"/edit/" ) === false && strpos( $full_url,"delete/" ) === false) {
+	if ( strpos( $full_url,"/huddle/event/" ) !== false && strpos( $full_url,"/edit/" ) === false && strpos( $full_url,"delete/" ) === false) {
 		// echo "======================";
 		global $wpdb;
 		$url = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}bp_groups_calendars WHERE event_slug='%s'",sanitize_text_field($slug)));
@@ -772,16 +776,16 @@ function bp_group_calendar_create_event_url( $event_id, $edit = false ) {
 	if(!$edit){
 		$event_title = $wpdb->get_var( "SELECT event_title FROM {$wpdb->prefix}bp_groups_calendars WHERE id='{$event_id}'");
 		$event_title = strtolower($event_title);
-		$event_title = str_replace(" ", "_", $event_title);
+		$event_title = str_replace(" ", "-", $event_title);
 		// echo "<br><br>bp_group_calendar_create_event_url<br>";
-		$url .= 'calendar/event/' . $event_title . '/';
+		$url .= 'huddle/event/' . $event_title . '/';
 	}else{
-		$url .= 'calendar/event/' . $event_id . '/';
+		$url .= 'huddle/event/' . $event_id . '/';
 	}
 	// exit;
 	/***** a21 ******/
 
-	// $url .= 'calendar/event/' . $event_id . '/';
+	// $url .= 'huddle/event/' . $event_id . '/';
 
 	if ( $edit ) {
 		$url .= "edit/";
@@ -799,10 +803,10 @@ function bp_group_calendar_create_event_url( $event_id, $edit = false ) {
 // 	$event_title = strtolower($event_title);
 // 	$event_title = str_replace(" ", "_", $event_title);
 
-// 	$url .= 'calendar/event/' . $event_title . '/';
+// 	$url .= 'huddle/event/' . $event_title . '/';
 // 	/***** a21 ******/
 
-// 	// $url .= 'calendar/event/' . $event_id . '/';
+// 	// $url .= 'huddle/event/' . $event_id . '/';
 
 // 	if ( $edit ) {
 // 		$url .= "edit/";
@@ -919,7 +923,7 @@ function bp_group_calendar_notification_settings() {
 //enqeue js on product settings screen
 function bp_group_calendar_js() {
 
-	if ( ! is_admin() && strpos( $_SERVER['REQUEST_URI'], '/calendar/' ) !== false ) {
+	if ( ! is_admin() && strpos( $_SERVER['REQUEST_URI'], '/huddle/' ) !== false ) {
 		global $bgc_locale;
 
 		wp_enqueue_style( 'groupcalendar-css', plugins_url( '/bp-group-calendar/groupcalendar/group_calendar.css' ), false );
@@ -935,7 +939,7 @@ function bp_group_calendar_js() {
 
 function bp_group_calendar_js_output() {
 	//display css
-	if ( ! is_admin() && strpos( $_SERVER['REQUEST_URI'], '/calendar/' ) !== false ) {
+	if ( ! is_admin() && strpos( $_SERVER['REQUEST_URI'], '/huddle/' ) !== false ) {
 		global $bgc_locale;
 		?>
 		<script type="text/javascript">
@@ -1088,7 +1092,7 @@ function bp_group_calendar_widget_day( $date ) {
 	$cal->week_start        = $bgc_locale['week_start'];
 	$first_day              = $cal->year . "-" . $cal->month . "-01";
 	$cal->highlighted_dates = bp_group_calendar_highlighted_events( $bp->groups->current_group->id, $first_day );
-	$url                    = bp_get_group_permalink( $bp->groups->current_group ) . 'calendar';
+	$url                    = bp_get_group_permalink( $bp->groups->current_group ) . 'huddle';
 	$url                    = rawurldecode( $url );
 	$cal->formatted_link_to = $url . '/%Y/%m/%d/';
 	?>
@@ -1125,7 +1129,7 @@ function bp_group_calendar_widget_month( $date ) {
 	}
 
 	$cal->week_start        = $bgc_locale['week_start'];
-	$url                    = bp_get_group_permalink( $bp->groups->current_group ) . 'calendar';
+	$url                    = bp_get_group_permalink( $bp->groups->current_group ) . 'huddle';
 	$url                    = rawurldecode( $url );
 	$cal->formatted_link_to = $url . '/%Y/%m/%d/';
 
@@ -1174,7 +1178,7 @@ function bp_group_calendar_widget_year( $date ) {
 	$year  = $date['year'];
 	$month = 1;
 
-	$url = bp_get_group_permalink( $bp->groups->current_group ) . 'calendar';
+	$url = bp_get_group_permalink( $bp->groups->current_group ) . 'huddle';
 	//first day of month for calulation previous and next years
 	$first_day     = $year . "-01-01";
 	$previous_year = $url . date( "/Y/", strtotime( "-1 year", strtotime( $first_day ) ) );
@@ -1376,7 +1380,7 @@ function bp_group_calendar_widget_create_event( $date ) {
 		}
 	}
 
-	$url = bp_get_group_permalink( $bp->groups->current_group ) . 'calendar/';
+	$url = bp_get_group_permalink( $bp->groups->current_group ) . 'huddle/';
 
 	?>
 	<div class="bp-widget">
@@ -1492,7 +1496,7 @@ function bp_group_calendar_widget_create_event( $date ) {
 function bp_group_calendar_widget_edit_event( $event_id = false ) {
 	global $wpdb, $current_user, $bp, $bgc_locale;
 
-	$url = bp_get_group_permalink( $bp->groups->current_group ) . 'calendar/';
+	$url = bp_get_group_permalink( $bp->groups->current_group ) . 'huddle/';
 
 	$group_id = $bp->groups->current_group->id;
 
@@ -1730,7 +1734,7 @@ class BP_Group_Calendar_Widget extends WP_Widget {
 				$class = ( $event->user_id == $current_user->ID ) ? ' class="my_event"' : '';
 				$events_list .= "\n<li" . $class . ">";
 				$group = groups_get_group( array( 'group_id' => $event->group_id ) );
-				$url   = bp_get_group_permalink( $group ) . 'calendar/event/' . $event->id . '/';
+				$url   = bp_get_group_permalink( $group ) . 'huddle/event/' . $event->id . '/';
 				$events_list .= stripslashes( $event->name ) . '<br /><a href="' . $url . '" title="' . __( 'View Event', 'groupcalendar' ) . '">' . bgc_date_display( $event->event_time ) . ': ' . stripslashes( $event->event_title ) . '</a>';
 				$events_list .= "</li>";
 			}
@@ -1810,7 +1814,7 @@ class BP_Group_Calendar_Widget_Single extends WP_Widget {
 				$class = ( $event->user_id == $current_user->ID ) ? ' class="my_event"' : '';
 				$events_list .= "\n<li" . $class . ">";
 				$group = groups_get_group( array( 'group_id' => $event->group_id ) );
-				$url   = bp_get_group_permalink( $group ) . 'calendar/event/' . $event->id . '/';
+				$url   = bp_get_group_permalink( $group ) . 'huddle/event/' . $event->id . '/';
 				$events_list .= stripslashes( $event->name ) . '<br /><a href="' . $url . '" title="' . __( 'View Event', 'groupcalendar' ) . '">' . bgc_date_display( $event->event_time ) . ': ' . stripslashes( $event->event_title ) . '</a>';
 				$events_list .= "</li>";
 			}
@@ -1917,7 +1921,7 @@ class BP_Group_Calendar_Widget_User_Groups extends WP_Widget {
 				$class = ( $event->user_id == $current_user->ID ) ? ' class="my_event"' : '';
 				$events_list .= "\n<li" . $class . ">";
 				$group = groups_get_group( array( 'group_id' => $event->group_id ) );
-				$url   = bp_get_group_permalink( $group ) . 'calendar/event/' . $event->id . '/';
+				$url   = bp_get_group_permalink( $group ) . 'huddle/event/' . $event->id . '/';
 				$events_list .= stripslashes( $event->name ) . '<br /><a href="' . $url . '" title="' . __( 'View Event', 'groupcalendar' ) . '">' . bgc_date_display( $event->event_time ) . ': ' . stripslashes( $event->event_title ) . '</a>';
 				$events_list .= "</li>";
 			}
