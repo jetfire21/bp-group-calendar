@@ -1250,6 +1250,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 	$event = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM " . $wpdb->base_prefix . "bp_groups_calendars WHERE group_id = %d AND id = %d", $group_id, $event_id ) );
 
 	/****** a21 event details*******/
+	
 	// var_dump($bgc_locale);
 	// echo 'bp_group_calendar_widget_event_display()';
 	// echo "<br>";
