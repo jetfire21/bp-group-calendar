@@ -1379,6 +1379,13 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		if($event_image) {?> <img src="<?php echo $event_image;?>" alt=""><?php }
 
 		// alex_debug(0,1,"",$event_tasks);
+		// echo "<br>is_login "; var_dump(is_user_logged_in());
+		// if(is_user_logged_in()){
+		// 	$user = wp_get_current_user();
+		// 	echo "<br>".$user->ID;
+		// 	echo "<br>".$user->data->user_login;
+		// }
+		// alex_debug(0,1,"",$user);
 
 		$need = " Needed";
 		if( !empty($event_tasks)):?>
@@ -1399,7 +1406,9 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 	        			        <tr class="a21_dinam_row">
 
 	        	<?php foreach ($task as $k => $task_cnt_vol):?>
-	        		 <td class="a21_dinam_coll"> <?php echo $task_cnt_vol." "; if($k !== 'task') echo $need;?> </td>
+	        		 <td class="a21_dinam_coll"> 
+	        		 <?php if($k !== 'task'){?> <button>Volunteer</button><?php } echo $task_cnt_vol." "; if($k !== 'task') echo $need;?> 
+	        		 </td>
 		        <?php endforeach;?>
 		        	        </tr>
 		        <?php endforeach;?>
