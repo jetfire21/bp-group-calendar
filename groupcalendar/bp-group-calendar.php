@@ -670,11 +670,14 @@ function bp_group_calendar_event_url_parse() {
 	// echo "<br>";
 	// echo $slug;
 	// echo "<br>";
-	if ( strpos( $full_url,"/calendar/event/" ) !== false && strpos( $full_url,"/edit/" ) === false ) {
+	if ( strpos( $full_url,"/calendar/event/" ) !== false && strpos( $full_url,"/edit/" ) === false && strpos( $full_url,"delete/" ) === false) {
 		// echo "======================";
 		global $wpdb;
-		$url = $wpdb->get_var( "SELECT id FROM {$wpdb->prefix}bp_groups_calendars WHERE event_slug='{$slug}'");
+		$url = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}bp_groups_calendars WHERE event_slug='%s'",sanitize_text_field($slug)));
 		// echo "get id form bd ".$slug;
+		// echo "<br>";
+		// var_dump($url);
+		// exit;
 	}
 	// echo "<br>";
 	// echo $url;
