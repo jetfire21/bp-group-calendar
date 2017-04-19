@@ -82,6 +82,7 @@ function bp_group_calendar_global_install() {
                                   `group_id` bigint(20) NOT NULL default '0',
                                   `user_id` bigint(20) NOT NULL default '0',
                                   `event_time` DATETIME NOT NULL,
+                                  `event_slug` VARCHAR(200) NOT NULL,
                                   `event_title` TEXT NOT NULL,
                                   `event_description` TEXT,
                                   `event_location` TEXT,
