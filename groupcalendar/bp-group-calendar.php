@@ -257,9 +257,8 @@ function bp_group_calendar_event_save() {
 		
 		// alex_debug(1,1,"",$_REQUEST);
 		// alex_debug(1,1,"",$_FILES);
-
-
-		// exit("bp_group_calendar_event_save()");
+		// alex_debug(1,1,"",$_POST);
+		// exit("=====bp_group_calendar_event_save()====");
 
 		/**** a21 ******/
 
@@ -406,17 +405,18 @@ function bp_group_calendar_event_save() {
 				    // echo $movefile['error'];
 				}
 
-				// if( !empty( $_POST['new_event_tasks']) ){
+				if( !empty( $_POST['new_event_tasks']) ){
 
-				// 	if(!empty($_POST['total-volunteers'])) $_POST['new_event_tasks']['total-volunteers'] = $_POST['total-volunteers'];
-				// 	$ser_str = serialize($_POST['new_event_tasks']);
-				// 	// alex_debug(0,1,"",unserialize($ser));
-				// 	$query = $wpdb->prepare( "INSERT INTO " . $wpdb->prefix . "bp_groups_groupmeta
-				// 		( group_id,meta_key,meta_value)
-				// 		VALUES ( %d,%s, %s )", $new_id, 'a21_bgc_event_tasks',$ser_str );
-				// 	$wpdb->query( $query );
+					if(!empty($_POST['total-volunteers'])) $_POST['new_event_tasks']['total-volunteers'] = $_POST['total-volunteers'];
+					$ser_str = serialize($_POST['new_event_tasks']);
+					// alex_debug(0,1,"",unserialize($ser));
+					$query = $wpdb->prepare( "INSERT INTO " . $wpdb->prefix . "bp_groups_groupmeta
+						( group_id,meta_key,meta_value)
+						VALUES ( %d,%s, %s )", $new_id, 'a21_bgc_event_tasks',$ser_str );
+					$wpdb->query( $query );
 
-				// }
+				}
+
 				// if(!empty($_POST['thank_you'])) {
 				// 	$query = $wpdb->prepare( "INSERT INTO " . $wpdb->prefix . "bp_groups_groupmeta
 				// 		( group_id,meta_key,meta_value)
@@ -1332,12 +1332,41 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		$event_tasks = unserialize($event_tasks);
 
 		if($event_image) {?> <img src="<?php echo $event_image;?>" alt=""><?php }
-		// alex_debug(0,1,"",$event_tasks);
+
+		alex_debug(0,1,"",$event_tasks);
+
 		$need = " Needed";
+		if( !empty($event_tasks)):?>
+
+		    <h6 class="event-label">Total Event Volunteers Needed:</h6> <?php echo $event_tasks['total-volunteers'].$need; 			
+		    unset($event_tasks['total-volunteers']); ?>
+
+			<table id="a21_bgc_tasks_shifts" style="margin-bottom: 5px;">
+	        	<tr class="title_columns">
+	        	   <th class="a21_dinam_th_coll"> Task item </th>
+	        	<?php foreach ($event_tasks['time'] as $k => $time):?>
+	        		<th class="a21_dinam_th_coll"> <?php echo $time;?> </th>
+		        <?php endforeach;?>
+		       </tr>
+		       <?php unset($event_tasks['time']);  /*alex_debug(0,1,"",$event_tasks); */ ?>
+	        	<?php foreach ($event_tasks as $task):?>
+	        			        <tr class="a21_dinam_row">
+
+	        	<?php foreach ($task as $k => $task_cnt_vol):?>
+	        		 <td class="a21_dinam_coll"> <?php echo $task_cnt_vol." ".$need;?> </td>
+		        <?php endforeach;?>
+		        	        </tr>
+		        <?php endforeach;?>
+			</table>
+		<?php 
+		endif;
+
+		/*
 		if( !empty($event_tasks)):
 			echo '<h6 class="event-label">Total Event Volunteers Needed:</h6>'.$event_tasks['total-volunteers'].$need;
 			unset($event_tasks['total-volunteers']);
 		 ?>
+<!-- 
 			 <h6 class="event-label">Event Tasks & Shifts:</h6>
 			<table id="a21_bgc_tasks_shifts">
 			<tr>
@@ -1345,6 +1374,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 				<th>SHIFT #1 (edit time details)</th>
 				<th>SHIFT #2 (edit time details)</th>
 			</tr>
+ -->			
 		<?php
 			foreach ($event_tasks as $v):
 				echo "<tr>";
@@ -1355,6 +1385,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 			endforeach;
 			echo "</table>";
 		endif;
+		*/
 		// alex_debug(0,1,"",$event_tasks);
 		 /**** a21 ******/ 
 		?>
