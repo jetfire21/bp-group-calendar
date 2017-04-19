@@ -46,6 +46,30 @@ add_action( 'widgets_init', create_function( '', 'return register_widget("BP_Gro
 
 //------------------------------------------------------------------------//
 
+/* **** as21 NEED FUTURE **** */
+add_action("a21_bgc_message_thankyou","a21_bgc_message_thankyou");
+
+function a21_bgc_message_thankyou(){
+
+	global $wpdb;
+	echo "<h3>TESTING a21_bgc_output_thankyou today:".date( 'Y-m-d H:i:s' )."</h3>";
+	// event_time >= '" . date( 'Y-m-d H:i:s' )
+	$events = $wpdb->get_results( $wpdb->prepare(
+		"SELECT * 
+		FROM {$wpdb->prefix}bp_groups_calendars
+		WHERE event_time <= %s
+		ORDER BY id ASC",
+		date( 'Y-m-d H:i:s' )
+	) );
+	// alex_debug(1,1,"",$events);
+	if(!empty($events)){
+		foreach ($events as $event) {
+			echo $event->event_title." ".$event->event_time; echo "<br>";
+		}
+	}
+
+}
+/* **** as21 NEED FUTURE **** */
 
 function bp_group_calendar_make_current() {
 
