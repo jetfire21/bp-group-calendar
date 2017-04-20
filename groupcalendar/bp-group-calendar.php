@@ -1516,20 +1516,32 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 		foreach ($event_tasks as $k => $task ) {
 			$cnt_vols = explode(",",$task->cnt_vols);
-			$ids_vols = explode(":",$task->ids_vols);
 			$event_tasks[$k]->cnt_vols = $cnt_vols;
-			$event_tasks[$k]->ids_vols = $ids_vols;
-			// print_r($cnt_vols);
-			foreach ($ids_vols as $k2 => $v) {
-				$ids_arr = explode(",",$v);
-				// print_r($event_tasks[$k]->cnt_vols);
-				// $event_tasks[$k]->ids_cnt[$k2] = $ids_arr;
-				// $event_tasks[$k]->ids_cnt[$k2]['cnt'] = $event_tasks[$k]->cnt_vols[$k2];
-				$event_tasks[$k]->ids_vols[$k2] = $ids_arr;
-				// $event_tasks[$k]->ids_cnt[$k2]['cnt'] = $event_tasks[$k]->cnt_vols[$k2];
-				echo "<br>";
-				// echo $k2." ".$v."<br>";
-			}
+
+			// $ids_vols = explode(":",$task->ids_vols);
+			// $event_tasks[$k]->ids_vols = $ids_vols;
+			// echo "======";
+			// print_r($task->ids_vols);
+
+			if( !empty($task->ids_vols) ) {
+
+				$ids_vols = explode(":",$task->ids_vols);
+				$event_tasks[$k]->ids_vols = $ids_vols;
+				// print_r($cnt_vols);
+				foreach ($ids_vols as $k2 => $v) {
+					if(!$v) break;
+					$ids_arr = explode(",",$v);
+					$event_tasks[$k]->ids_vols[$k2] = $ids_arr;
+					// print_r($event_tasks[$k]->cnt_vols);
+					// $event_tasks[$k]->ids_cnt[$k2] = $ids_arr;
+					// $event_tasks[$k]->ids_cnt[$k2]['cnt'] = $event_tasks[$k]->cnt_vols[$k2];
+					// $event_tasks[$k]->ids_cnt[$k2]['cnt'] = $event_tasks[$k]->cnt_vols[$k2];
+					echo "<br>";
+					// echo $k2." ".$v."<br>";
+				}
+
+			}else { unset($task->ids_vols);}
+
 		}
 		/* **** as21 parse ids_vols & count vols**** */
 
@@ -1593,12 +1605,32 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 	        		<?php foreach ($task->cnt_vols as $k2 => $cnt):?>
 		        		 <td class="a21_dinam_coll"> 
 		        		 <?php 
-		        		 foreach ($task->ids_vols[$k2] as $vol_id) {
-		        		 	// hide if cur_user sign up to event task in cur time
-		   				 	if($cur_user->ID == $vol_id) $vol_hide_btn = true; 
-		   				 	else $vol_hide_btn = false;
-		        		 }
-		        		 // var_dump($vol_hide_btn);
+		        		 echo " cnt ".$cnt." == task->ids_vols[k2] $k2, ".count($task->ids_vols[$k2]);
+		        		 echo "<br>";
+
+		        		 if( !empty($task->ids_vols[$k2]) ){
+		        			 echo "-----IDS VOLS---";
+		        		  	 var_dump($task->ids_vols[$k2]);
+		        			 var_dump( count($task->ids_vols[$k2]));
+
+			        		 if( $cnt == count($task->ids_vols[$k2])) $vol_hide_btn = true;
+			        		 else{
+			        		 	 // if( !empty($task->ids_vols[$k2]) ):
+					        		 foreach ($task->ids_vols[$k2] as $vol_id) {	
+	 		 	 			        	 echo " cur_user ".$cur_user->ID." = vol_id ".$vol_id;
+				 		        		 echo "<br>";
+		        		 	
+					        		 	// hide if cur_user sign up to event task in cur time
+					   				 	if($cur_user->ID == $vol_id) $vol_hide_btn = true; 
+					   				 	else $vol_hide_btn = false;
+					        		 }
+				        		 // endif;
+			        	 	}
+			        	 } else $vol_hide_btn = false;
+
+			        	 print_r($task->ids_vols[$k2]);
+
+		        		 echo 'vol_hide_btn '; var_dump($vol_hide_btn);
 		        		 if(!$vol_hide_btn):
 		        		 ?>
 		        		 <button class="a21_add_new_volunteer" data-i="<?php echo $k2;?>" data-id="<?php echo $cur_user->ID;?>" data-nick="<?php echo $cur_user->data->user_login;?>">Volunteer</button>
