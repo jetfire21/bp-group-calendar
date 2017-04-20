@@ -118,6 +118,18 @@ function bp_group_calendar_global_install() {
                                 ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
 		$wpdb->query( $bp_group_calendar_table1 );
+
+        $a21_bgc_table2 = "CREATE TABLE IF NOT EXISTS `" . $wpdb->prefix . "bp_group_bgc_tasks` (
+                          `id` bigint(20) unsigned NOT NULL auto_increment,
+                          `event_id` bigint(20) UNSIGNED NOT NULL,
+                          `task_title` text NOT NULL,
+                          `task_time` varchar(15) NOT NULL,
+                          `count_vol` smallint(5) UNSIGNED NOT NULL,
+                          `ids_vol` varchar(255) NOT NULL
+                          PRIMARY KEY  (`id`)
+                        ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;";
+		$wpdb->query( $a21_bgc_table2 );
+
 		update_site_option( "bp_group_calendar_installed", "yes" );
 	}
 }
@@ -1380,11 +1392,11 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 		// alex_debug(0,1,"",$event_tasks);
 		// echo "<br>is_login "; var_dump(is_user_logged_in());
-		// if(is_user_logged_in()){
-		// 	$user = wp_get_current_user();
-		// 	echo "<br>".$user->ID;
-		// 	echo "<br>".$user->data->user_login;
-		// }
+		if(is_user_logged_in()){
+			$user = wp_get_current_user();
+			echo "<br>".$user->ID;
+			echo "<br>".$user->data->user_login;
+		}
 		// alex_debug(0,1,"",$user);
 
 		$need = " Needed";
@@ -1403,14 +1415,17 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		       </tr>
 		       <?php unset($event_tasks['time']);  /*alex_debug(0,1,"",$event_tasks); */ ?>
 	        	<?php foreach ($event_tasks as $task):?>
-	        			        <tr class="a21_dinam_row">
-
-	        	<?php foreach ($task as $k => $task_cnt_vol):?>
+		        <tr class="a21_dinam_row">
+	        		<?php foreach ($task as $k => $task_cnt_vol):?>
 	        		 <td class="a21_dinam_coll"> 
-	        		 <?php if($k !== 'task'){?> <button>Volunteer</button><?php } echo $task_cnt_vol." "; if($k !== 'task') echo $need;?> 
+	        		 <?php if($k !== 'task'){?> 
+	        		 <button class="a21_add_new_volunteer" data-id="<?php echo $user->ID;?>" data-nick="<?php echo $user->data->user_login;?>">Volunteer</button><?php }?>
+	        		 <p>
+	        		  <?php echo "<span class='vol_cnt'>".$task_cnt_vol."</span> "; if($k !== 'task') echo $need;?> 
+	        		  </p>
 	        		 </td>
-		        <?php endforeach;?>
-		        	        </tr>
+		      		 <?php endforeach;?>
+    	        </tr>
 		        <?php endforeach;?>
 			</table>
 		<?php 
