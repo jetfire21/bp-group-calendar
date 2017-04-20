@@ -294,7 +294,6 @@ function bp_group_calendar_event_save() {
 		// alex_debug(1,1,"",$_REQUEST);
 		// alex_debug(1,1,"",$_FILES);
 		// alex_debug(1,1,"",$_POST);
-
 		// alex_debug(1,1,"",$_POST);
 		// exit("=====bp_group_calendar_event_save()====");
 
@@ -328,7 +327,11 @@ function bp_group_calendar_event_save() {
 		}
 
 		$tmp_date = $_POST['event-date'] . ' ' . $_POST['event-hour'] . ':' . $_POST['event-minute'] . $_POST['event-ampm'];
+
 		$tmp_date = strtotime( $tmp_date );
+
+
+
 		//check for valid date/time
 		if ( $tmp_date && strtotime( $_POST['event-date'] ) && strtotime( $_POST['event-date'] ) != - 1 ) {
 			$event_date = gmdate( 'Y-m-d H:i:s', ( $tmp_date - ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) ) ); //assumed date entered in timezone offset. Subtract the offset to get GMT for storage.
@@ -337,6 +340,16 @@ function bp_group_calendar_event_save() {
 
 			return false;
 		}
+		
+		/* **** as21 **** */
+
+		$check_dbl_event = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}bp_groups_calendars WHERE event_time=%s AND event_title=%s",$event_date,$event_title));
+		// var_dump($check_event);
+		
+		// when event exist
+		if(!is_null($check_dbl_event)) return false;
+
+		/* **** as21 **** */
 
 		$event_description = wp_filter_post_kses( wpautop( $_POST['event-desc'] ) );
 		$event_location    = esc_attr( strip_tags( trim( $_POST['event-loc'] ) ) );
@@ -423,7 +436,7 @@ function bp_group_calendar_event_save() {
 				bp_group_calendar_event_email( true, $new_id, $event_date, $event_title );
 
 
-				/**** a21 ******/
+				/**** a21 image post ******/
 
 				if ( ! function_exists( 'wp_handle_upload' ) ) {
 				    require_once( ABSPATH . 'wp-admin/includes/file.php' );
@@ -449,7 +462,10 @@ function bp_group_calendar_event_save() {
 				    // echo $movefile['error'];
 				}
 
-				
+				/**** a21 image post ******/
+
+				/**** a21 tasks post ******/
+
 				if( !empty( $_POST['new_event_tasks']) && $_POST['new_event_tasks'] > 1){
 
 					// sanitizing input data
@@ -490,8 +506,8 @@ function bp_group_calendar_event_save() {
 					$times = $esc_post['new_event_tasks']['time'];
 					unset($esc_post['new_event_tasks']['time']);
 
-				    alex_debug(0,1,"",$times); 
-				    alex_debug(0,1,"",$esc_post); 
+				    // alex_debug(0,1,"",$times); 
+				    // alex_debug(0,1,"",$esc_post); 
 				    foreach ($esc_post['new_event_tasks'] as $task):
 				    	$i = 0;  // counter time
 				         foreach ($task as $k => $title_and_cnt):
@@ -506,10 +522,19 @@ function bp_group_calendar_event_save() {
 				     $wpdb->query($sql);
 				     // echo "as21 option 2";
 				    // exit;
-
+				     unset($_POST);
+				     $_POST = '';
+					// alex_debug(0,1,"",$_POST);
+					// header("Location: http://ya.ru");
+				     // wp_redirect( "http://ya.ru", 303 );
+					// exit;
+					// echo '<script type="text/javascript">location.reload();</script>';					
+					// header("Location: ".$_SERVER['HTTP_REFERER']);					
 					/* **** as21 option 2**** */
 
 				}
+				/**** a21 tasks post ******/
+
 
 				// if(!empty($_POST['thank_you'])) {
 				// 	$query = $wpdb->prepare( "INSERT INTO " . $wpdb->prefix . "bp_groups_groupmeta
@@ -536,7 +561,7 @@ function bp_group_calendar_event_save() {
 
 		}
 
-	}
+	} 	// end if isset ($_POST['create-event'] ) 
 }
 
 //register activities
