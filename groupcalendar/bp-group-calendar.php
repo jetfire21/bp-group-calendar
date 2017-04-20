@@ -518,12 +518,10 @@ function bp_group_calendar_event_save() {
 				          endforeach;
 				     endforeach;
 				     $sql = substr($sql,0, -1);
-				     echo $sql = "INSERT INTO {$wpdb->prefix}bp_groups_bgc_tasks (event_id,task_title,task_time,count_vol) VALUES ".$sql;
+				     $sql = "INSERT INTO {$wpdb->prefix}bp_groups_bgc_tasks (event_id,task_title,task_time,count_vol) VALUES ".$sql;
 				     $wpdb->query($sql);
 				     // echo "as21 option 2";
 				    // exit;
-				     unset($_POST);
-				     $_POST = '';
 					// alex_debug(0,1,"",$_POST);
 					// header("Location: http://ya.ru");
 				     // wp_redirect( "http://ya.ru", 303 );
@@ -1447,18 +1445,63 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		<?php
 		/**** a21_display******/
 		$event_image = $wpdb->get_var( "SELECT meta_value FROM {$wpdb->prefix}bp_groups_groupmeta WHERE group_id='{$event_id}' AND meta_key='a21_bgc_event_image'");
-		$event_tasks = $wpdb->get_var( "SELECT meta_value FROM {$wpdb->prefix}bp_groups_groupmeta WHERE group_id='{$event_id}' AND meta_key='a21_bgc_event_tasks'");
-		$event_tasks = unserialize($event_tasks);
+		// $event_tasks = $wpdb->get_var( "SELECT meta_value FROM {$wpdb->prefix}bp_groups_groupmeta WHERE group_id='{$event_id}' AND meta_key='a21_bgc_event_tasks'");
+		// $event_tasks = unserialize($event_tasks);
+
+		// $event_tasks = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id='{$event_id}'");
+		$event_tasks = $wpdb->get_results( "SELECT * FROM bp_taks WHERE event_id='11'");
+		$event_times = $wpdb->get_results( "SELECT * FROM bp_time WHERE event_id='11'");
+
+	    // foreach ($esc_post['new_event_tasks'] as $task):
+	    // 	$i = 0;  // counter time
+	    //      foreach ($task as $k => $title_and_cnt):
+	    //      	  if($k === 'task') $title_task = $title_and_cnt;
+	    //      	  else { $sql .= $wpdb->prepare("(%d,%s,%s,%d),", $new_id, $title_task, $times[$i], $title_and_cnt);  $i++;}
+	    //      	  // $new_id - id last add event
+	    //      	  //  (task_title,task_time,count_vol) VALUES ($title_task, $times[$i], $title_and_cnt);
+	    //       endforeach;
+	    //  endforeach;
+	    //  $sql = substr($sql,0, -1);
+	    //  $sql = "INSERT INTO {$wpdb->prefix}bp_groups_bgc_tasks (event_id,task_title,task_time,count_vol) VALUES ".$sql;
+	    //  $wpdb->query($sql);
+
 
 		if($event_image) {?> <img src="<?php echo $event_image;?>" alt=""><?php }
 
-		// alex_debug(0,1,"",$event_tasks);
+		alex_debug(0,1,"",$event_tasks);
+		alex_debug(0,1,"",$event_times);
+
+		/* **** as21 parse ids_vols & count vols**** */
+
+		foreach ($event_tasks as $k => $task ) {
+			$cnt_vols = explode(",",$task->cnt_vols);
+			$ids_vols = explode(":",$task->ids_vols);
+			$event_tasks[$k]->cnt_vols = $cnt_vols;
+			$event_tasks[$k]->ids_vols = $ids_vols;
+			// print_r($cnt_vols);
+			foreach ($ids_vols as $k2 => $v) {
+				$ids_arr = explode(",",$v);
+				// print_r($event_tasks[$k]->cnt_vols);
+				// $event_tasks[$k]->ids_cnt[$k2] = $ids_arr;
+				// $event_tasks[$k]->ids_cnt[$k2]['cnt'] = $event_tasks[$k]->cnt_vols[$k2];
+				$event_tasks[$k]->ids_vols[$k2] = $ids_arr;
+				// $event_tasks[$k]->ids_cnt[$k2]['cnt'] = $event_tasks[$k]->cnt_vols[$k2];
+				echo "<br>";
+				// echo $k2." ".$v."<br>";
+			}
+		}
+		/* **** as21 parse ids_vols & count vols**** */
+
+		alex_debug(0,1,"",$event_tasks);
+
+
 		// echo "<br>is_login "; var_dump(is_user_logged_in());
 		if(is_user_logged_in()){
 			$user = wp_get_current_user();
 			echo "<br>".$user->ID;
 			echo "<br>".$user->data->user_login;
 		}
+
 		// alex_debug(0,1,"",$user);
 
 		$need = " Needed";
@@ -1468,6 +1511,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		    unset($event_tasks['total-volunteers']); ?>
 			
 			<h6 class="event-label">Event Tasks & Shifts:</h6>
+
 			<table id="a21_bgc_tasks_shifts" style="margin-bottom: 5px;">
 	        	<tr class="title_columns">
 	        	   <th class="a21_dinam_th_coll"> Task item </th>
@@ -1490,6 +1534,39 @@ function bp_group_calendar_widget_event_display( $event_id ) {
     	        </tr>
 		        <?php endforeach;?>
 			</table>
+
+			<?php /* **** as21 parse ids_vols & count vols - output **** */ ?>
+
+			<table id="a21_bgc_tasks_shifts" style="margin-bottom: 5px;">
+	        	<tr class="title_columns">
+	        	   <th class="a21_dinam_th_coll"> Task item </th>
+	        	<?php foreach ($event_times as $k => $v):?>
+	        		<th class="a21_dinam_th_coll"> <?php echo $v->time;?> </th>
+		        <?php endforeach;?>
+		       </tr>
+		       <?php unset($event_tasks['time']);  /*alex_debug(0,1,"",$event_tasks); */ ?>
+	        	<?php foreach ($event_tasks as $k => $task):?>
+		        <tr class="a21_dinam_row">
+		        	<td class="a21_dinam_coll"> <?php echo $task->task_title;?></td>
+	        		<?php foreach ($task->cnt_vols as $k2 => $cnt):?>
+	        		 <td class="a21_dinam_coll"> 
+	        		 <button class="a21_add_new_volunteer" data-id="<?php echo $user->ID;?>" data-nick="<?php echo $user->data->user_login;?>">Volunteer</button>
+	        		 <p>
+	        		  <?php echo "<span class='vol_cnt'>".$cnt."</span> "; echo $need."<br>"; 
+	        		  // print_r($event_tasks[$k]->ids_vols[$k2]);
+	        		  foreach ($event_tasks[$k]->ids_vols[$k2] as $member_id) {
+  	        		      echo $member_name = bp_core_get_username($member_id)."<br>";
+	        		  }
+	        		  ?> 
+	        		  </p>
+	        		 </td>
+		      		 <?php endforeach;?>
+    	        </tr>
+		        <?php endforeach;?>
+			</table>
+
+			<?php /* **** as21 parse ids_vols & count vols - output **** */ ?>
+
 		<?php 
 		endif;
 
