@@ -119,13 +119,13 @@ function bp_group_calendar_global_install() {
 
 		$wpdb->query( $bp_group_calendar_table1 );
 
-        $a21_bgc_table2 = "CREATE TABLE IF NOT EXISTS `" . $wpdb->prefix . "bp_group_bgc_tasks` (
+        $a21_bgc_table2 = "CREATE TABLE IF NOT EXISTS `" . $wpdb->prefix . "bp_groups_bgc_tasks` (
                           `id` bigint(20) unsigned NOT NULL auto_increment,
                           `event_id` bigint(20) UNSIGNED NOT NULL,
                           `task_title` text NOT NULL,
                           `task_time` varchar(15) NOT NULL,
                           `count_vol` smallint(5) UNSIGNED NOT NULL,
-                          `ids_vol` varchar(255) NOT NULL
+                          `ids_vol` varchar(255) NOT NULL,
                           PRIMARY KEY  (`id`)
                         ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;";
 		$wpdb->query( $a21_bgc_table2 );
@@ -299,6 +299,9 @@ function bp_group_calendar_event_save() {
 		// exit("=====bp_group_calendar_event_save()====");
 
 		/**** a21 ******/
+	// echo "ev-tasks ".count($_POST['new_event_tasks']);
+
+
 
 		if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'bp_group_calendar' ) ) {
 			bp_core_add_message( __( 'There was a security problem', 'groupcalendar' ), 'error' );
@@ -402,6 +405,7 @@ function bp_group_calendar_event_save() {
 			}
 
 		} else { //new event
+
 			$event_slug = strtolower($event_title);
 			$event_slug = str_replace(" ", "-", $event_slug);
 
@@ -418,7 +422,9 @@ function bp_group_calendar_event_save() {
 				//email group members
 				bp_group_calendar_event_email( true, $new_id, $event_date, $event_title );
 
+
 				/**** a21 ******/
+
 				if ( ! function_exists( 'wp_handle_upload' ) ) {
 				    require_once( ABSPATH . 'wp-admin/includes/file.php' );
 				}
@@ -443,7 +449,8 @@ function bp_group_calendar_event_save() {
 				    // echo $movefile['error'];
 				}
 
-				if( !empty( $_POST['new_event_tasks']) ){
+				
+				if( !empty( $_POST['new_event_tasks']) && $_POST['new_event_tasks'] > 1){
 
 					// sanitizing input data
 					foreach ($_POST['new_event_tasks']['time'] as $k => $time) {
@@ -461,7 +468,9 @@ function bp_group_calendar_event_save() {
 						}
 					}
 
+					/* **** as21 option 1**** *
 					if(!empty($_POST['total-volunteers'])) $esc_post['new_event_tasks']['total-volunteers'] = (int)$_POST['total-volunteers'];
+
 					// $_POST['thank_you'] = sanitize_text_field($_POST['thank_you']);
 					// $_POST['total-volunteers'] = (int)$_POST['total-volunteers'];
 
@@ -471,6 +480,34 @@ function bp_group_calendar_event_save() {
 						( group_id,meta_key,meta_value)
 						VALUES ( %d,%s, %s )", $new_id, 'a21_bgc_event_tasks',$ser_str );
 					$wpdb->query( $query );
+					* **** as21 option 1**** */
+
+					/* **** as21 option 2**** */
+
+				   //  foreach ($event_tasks['time'] as $k => $time):
+				   //     echo $time;
+				   // endforeach;
+					$times = $esc_post['new_event_tasks']['time'];
+					unset($esc_post['new_event_tasks']['time']);
+
+				    alex_debug(0,1,"",$times); 
+				    alex_debug(0,1,"",$esc_post); 
+				    foreach ($esc_post['new_event_tasks'] as $task):
+				    	$i = 0;  // counter time
+				         foreach ($task as $k => $title_and_cnt):
+				         	  if($k === 'task') $title_task = $title_and_cnt;
+				         	  else { $sql .= $wpdb->prepare("(%d,%s,%s,%d),", $new_id, $title_task, $times[$i], $title_and_cnt);  $i++;}
+				         	  // $new_id - id last add event
+				         	  //  (task_title,task_time,count_vol) VALUES ($title_task, $times[$i], $title_and_cnt);
+				          endforeach;
+				     endforeach;
+				     $sql = substr($sql,0, -1);
+				     echo $sql = "INSERT INTO {$wpdb->prefix}bp_groups_bgc_tasks (event_id,task_title,task_time,count_vol) VALUES ".$sql;
+				     $wpdb->query($sql);
+				     // echo "as21 option 2";
+				    // exit;
+
+					/* **** as21 option 2**** */
 
 				}
 
