@@ -159,7 +159,7 @@ function bp_group_calendar_global_install() {
                                 ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
 		$wpdb->query( $bp_group_calendar_table1 );
-
+/*
         $a21_bgc_table2 = "CREATE TABLE IF NOT EXISTS `" . $wpdb->prefix . "bp_groups_bgc_tasks` (
                           `id` bigint(20) unsigned NOT NULL auto_increment,
                           `event_id` bigint(20) UNSIGNED NOT NULL,
@@ -170,6 +170,25 @@ function bp_group_calendar_global_install() {
                           PRIMARY KEY  (`id`)
                         ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;";
 		$wpdb->query( $a21_bgc_table2 );
+*/
+		$a21_bgc_table3 = "CREATE TABLE IF NOT EXISTS `" . $wpdb->prefix . "bp_groups_bgc_tasks` (
+						  `id` bigint(20) UNSIGNED NOT NULL,
+						  `event_id` bigint(20) UNSIGNED NOT NULL,
+						  `task_title` varchar(255) NOT NULL,
+						  `cnt_vols` varchar(255) NOT NULL,
+						  `ids_vols` varchar(255) NOT NULL,
+						  PRIMARY KEY  (`id`)
+						) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;";
+
+		$wpdb->query( $a21_bgc_table3 );
+
+		$a21_bgc_table4 = "CREATE TABLE IF NOT EXISTS `" . $wpdb->prefix . "bp_groups_bgc_time` (
+						  `id` int(20) UNSIGNED NOT NULL,
+						  `event_id` bigint(20) NOT NULL,
+						  `time` varchar(20) NOT NULL,
+						  PRIMARY KEY  (`id`)
+						) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;";
+		$wpdb->query( $a21_bgc_table4 );
 
 		update_site_option( "bp_group_calendar_installed", "yes" );
 	}
@@ -1555,7 +1574,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 			echo "<br>".$cur_user->data->user_login;
 		}
 
-		// alex_debug(0,1,"",$user);
+		// alex_debug(0,1,"",$cur_user);
 
 		$need = " Needed";
 		if( !empty($event_tasks)):?>
@@ -1578,7 +1597,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 	        		<?php foreach ($task as $k => $task_cnt_vol):?>
 	        		 <td class="a21_dinam_coll"> 
 	        		 <?php if($k !== 'task'){?> 
-	        		 <button class="a21_add_new_volunteer" data-id="<?php echo $cur_user->ID;?>" data-nick="<?php echo $cur_user->data->user_login;?>">Volunteer</button><?php }?>
+	        		 <button class="a21_add_new_volunteer" data-id="<?php echo $cur_user->ID;?>" data-nick="<?php echo $cur_user->data->user_nicename;?>">signup</button><?php }?>
 	        		 <p>
 	        		  <?php echo "<span class='vol_cnt'>".$task_cnt_vol."</span> "; if($k !== 'task') echo $need;?> 
 	        		  </p>
@@ -1633,11 +1652,12 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		 echo 'vol_hide_btn '; var_dump($vol_hide_btn);
 		        		 if(!$vol_hide_btn):
 		        		 ?>
-		        		 <button class="a21_add_new_volunteer" data-i="<?php echo $k2;?>" data-id="<?php echo $cur_user->ID;?>" data-nick="<?php echo $cur_user->data->user_login;?>">Volunteer</button>
+		        		 <button class="a21_add_new_volunteer" data-i="<?php echo $k2;?>" data-id="<?php echo $cur_user->ID;?>" data-nick="<?php echo $cur_user->data->user_login;?>">signup</button>
 		        		 <?php endif;?>
 		        		 <p>
 		        		  <?php 
-		        		  echo $cur_count = count($event_tasks[$k]->ids_vols[$k2]);
+		        		  $cur_count = count($event_tasks[$k]->ids_vols[$k2]);
+		        		  echo "current count=".$cur_count;
 		        		  echo "<br>";
 		        		  if($cnt >= $cur_count) echo "full";
 		        		  echo "<br>";
