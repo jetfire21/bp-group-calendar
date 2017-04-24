@@ -172,7 +172,7 @@ function bp_group_calendar_global_install() {
 		$wpdb->query( $a21_bgc_table2 );
 */
 		$a21_bgc_table3 = "CREATE TABLE IF NOT EXISTS `" . $wpdb->prefix . "bp_groups_bgc_tasks` (
-						  `id` bigint(20) UNSIGNED NOT NULL,
+						  `id` bigint(20) UNSIGNED NOT NULL auto_increment,
 						  `event_id` bigint(20) UNSIGNED NOT NULL,
 						  `task_title` varchar(255) NOT NULL,
 						  `cnt_vols` varchar(255) NOT NULL,
@@ -183,7 +183,7 @@ function bp_group_calendar_global_install() {
 		$wpdb->query( $a21_bgc_table3 );
 
 		$a21_bgc_table4 = "CREATE TABLE IF NOT EXISTS `" . $wpdb->prefix . "bp_groups_bgc_time` (
-						  `id` int(20) UNSIGNED NOT NULL,
+						  `id` int(20) UNSIGNED NOT NULL auto_increment,
 						  `event_id` bigint(20) NOT NULL,
 						  `time` varchar(20) NOT NULL,
 						  PRIMARY KEY  (`id`)
@@ -354,7 +354,9 @@ function bp_group_calendar_event_save() {
 		// alex_debug(1,1,"",$_REQUEST);
 		// alex_debug(1,1,"",$_FILES);
 		// alex_debug(1,1,"",$_POST);
-		// alex_debug(1,1,"",$_POST);
+
+
+
 		// exit("=====bp_group_calendar_event_save()====");
 
 		/**** a21 ******/
@@ -524,8 +526,6 @@ function bp_group_calendar_event_save() {
 
 				/**** a21 image post ******/
 
-				/**** a21 tasks post ******/
-
 				if( !empty( $_POST['new_event_tasks']) && $_POST['new_event_tasks'] > 1){
 
 					// sanitizing input data
@@ -543,6 +543,43 @@ function bp_group_calendar_event_save() {
 							}
 						}
 					}
+
+					/* **** option 3 **** */
+					$times = $esc_post['new_event_tasks']['time'];
+					unset($esc_post['new_event_tasks']['time']);
+
+				    // alex_debug(0,1,"",$times); 
+				    // alex_debug(0,1,"",$esc_post); 
+				    // $new_id = 11;
+
+				    foreach ($esc_post['new_event_tasks'] as $task):
+				    	$i = 0;  // counter time
+			            $cnts = '';
+				         foreach ($task as $k => $title_and_cnt):
+				         	  if($k === 'task') $title_task = $title_and_cnt;
+				         	  else { $cnts .= $title_and_cnt.",";  $i++;}
+				         	  // $new_id - id last add event
+				         	  //  (task_title,task_time,count_vol) VALUES ($title_task, $times[$i], $title_and_cnt);
+				          endforeach;
+				          // $sql .= $title_task.$cnts;
+      				     $cnts = substr($cnts,0, -1);
+				          $sql .= $wpdb->prepare("(%d,%s,%s),", $new_id, $title_task, $cnts); 
+				     endforeach;
+				     $sql = substr($sql,0, -1);
+				     $tasks_sql = "INSERT INTO {$wpdb->prefix}bp_groups_bgc_tasks (event_id,task_title,cnt_vols) VALUES ".$sql;
+				     // echo $tasks_sql;
+				     $wpdb->query($tasks_sql);
+				     foreach ($times as $v) {
+				     	// $times_str .= $new_id.",".$v.",";
+ 			            $values .= $wpdb->prepare("(%d,%s),", $new_id, $v);
+				     }
+				    $values = substr($values,0, -1);
+		            //$sql = "INSERT INTO {$wpdb->prefix}bp_groups_bgc_tasks (event_id,time) VALUES ".$values;
+		            $times_sql = "INSERT INTO {$wpdb->prefix}bp_groups_bgc_time (`event_id`,`time`) VALUES ".$values;
+				     $wpdb->query($times_sql);
+		            // echo "<br>".$sql;
+
+					/* **** option 3 **** */
 
 					/* **** as21 option 1**** *
 					if(!empty($_POST['total-volunteers'])) $esc_post['new_event_tasks']['total-volunteers'] = (int)$_POST['total-volunteers'];
@@ -563,6 +600,8 @@ function bp_group_calendar_event_save() {
 				   //  foreach ($event_tasks['time'] as $k => $time):
 				   //     echo $time;
 				   // endforeach;
+
+					/* main func
 					$times = $esc_post['new_event_tasks']['time'];
 					unset($esc_post['new_event_tasks']['time']);
 
@@ -580,6 +619,8 @@ function bp_group_calendar_event_save() {
 				     $sql = substr($sql,0, -1);
 				     $sql = "INSERT INTO {$wpdb->prefix}bp_groups_bgc_tasks (event_id,task_title,task_time,count_vol) VALUES ".$sql;
 				     $wpdb->query($sql);
+					*/
+
 				     // echo "as21 option 2";
 				    // exit;
 					// alex_debug(0,1,"",$_POST);
@@ -587,7 +628,8 @@ function bp_group_calendar_event_save() {
 				     // wp_redirect( "http://ya.ru", 303 );
 					// exit;
 					// echo '<script type="text/javascript">location.reload();</script>';					
-					// header("Location: ".$_SERVER['HTTP_REFERER']);					
+					// header("Location: ".$_SERVER['HTTP_REFERER']);	
+
 					/* **** as21 option 2**** */
 
 				}
@@ -1509,8 +1551,8 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		// $event_tasks = unserialize($event_tasks);
 
 		// $event_tasks = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id='{$event_id}'");
-		$event_tasks = $wpdb->get_results( "SELECT * FROM bp_taks WHERE event_id='11'");
-		$event_times = $wpdb->get_results( "SELECT * FROM bp_time WHERE event_id='11'");
+		$event_tasks = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id='{$event_id}'");
+		$event_times = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_time WHERE event_id='{$event_id}'");
 
 	    // foreach ($esc_post['new_event_tasks'] as $task):
 	    // 	$i = 0;  // counter time
