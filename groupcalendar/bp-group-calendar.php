@@ -78,9 +78,11 @@ function a21_bgc_add_new_volunteer(){
 	// echo "wp ajax success!";
 	echo "<br>user_id ".$_POST['user_id'];
 	echo "<br>task_id ".$_POST['task_id'];
+	echo "<br>event_id ".$_POST['event_id'];
 	$num_cur_column = (int)$_POST['i'];
 	echo "<br>i ".$num_cur_column;
 	echo "<br>";
+	// exit;
 	global $wpdb;
 	$event_task = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE id = %d", $_POST['task_id'] ) );
 	print_r($event_task);
@@ -88,9 +90,9 @@ function a21_bgc_add_new_volunteer(){
 	if(empty($event_task->ids_vols)) {
 		// if ids_vols is empty,then insert current memeber_id 
 		echo "\r\nids_vols-empty";
-	    $column_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}bp_groups_bgc_time");
+	    $column_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}bp_groups_bgc_time WHERE event_id='".$_POST['event_id']."'");
 	    echo "\r\ncolumn_count=".$column_count;
-	    for($i=0;$i<$column_count;$i++){
+	    for($i=0; $i<$column_count; $i++){
 	    	// format record ids_vols 2,3:3,4,2:2,1,2 	// ::1 or 1:: or :1:
 	    	if($i==$num_cur_column) { $val .= $_POST['user_id'];}
 	    	else { $val .= ""; if($i < $column_count) $val .= ":";}
@@ -106,8 +108,8 @@ function a21_bgc_add_new_volunteer(){
 		);
 
 	}
-	// exit;
-	if(!empty($event_task)){
+	else{
+	// if(!empty($event_task->ids_vols)){
 		$ids_vols = explode(":",$event_task->ids_vols);
 		print_r($ids_vols);
 		echo "arr vols cur task=".$ids_vols[$_POST['i']];
@@ -1601,14 +1603,14 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		// alex_debug(0,1,"",$event_times);
 
 		/* **** as21 parse ids_vols & count vols**** */
-
+		// echo "as21 parse ids_vols & count vols<hr>";
 		foreach ($event_tasks as $k => $task ) {
 			$cnt_vols = explode(",",$task->cnt_vols);
 			$event_tasks[$k]->cnt_vols = $cnt_vols;
 
 			// $ids_vols = explode(":",$task->ids_vols);
 			// $event_tasks[$k]->ids_vols = $ids_vols;
-			// echo "======";
+			// echo "==== inside loop as21 parse ids_vols & count vols ====<br>";
 			// print_r($task->ids_vols);
 
 			if( !empty($task->ids_vols) ) {
@@ -1616,8 +1618,10 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 				$ids_vols = explode(":",$task->ids_vols);
 				$event_tasks[$k]->ids_vols = $ids_vols;
 				// print_r($cnt_vols);
+				// alex_debug(0,1,"ids_vols=",$ids_vols);
 				foreach ($ids_vols as $k2 => $v) {
-					if(!$v) break;
+					// if(!$v) break;  // comment today (когда 1 ряд и много колонок ids_vols не парсятся)
+					// echo "v==".$v;
 					$ids_arr = explode(",",$v);
 					$event_tasks[$k]->ids_vols[$k2] = $ids_arr;
 					// print_r($event_tasks[$k]->cnt_vols);
@@ -1678,7 +1682,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
  -->
 			<?php /* **** as21 parse ids_vols & count vols - output **** */ ?>
 
-			<table id="a21_bgc_tasks_shifts" style="margin-bottom: 5px;">
+			<table id="a21_bgc_tasks_shifts" data-event-id="<?php echo $event_id;?>" style="margin-bottom: 5px;">
 
 	        	<tr class="title_columns">
 	        	   <th class="a21_dinam_th_coll"> Task item </th>
@@ -1688,8 +1692,10 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		       </tr>
 
 	        	<?php foreach ($event_tasks as $k => $task):?>
+
 		        <tr class="a21_dinam_row" data-task_id="<?php echo $task->id;?>">
 		        	<td class="a21_dinam_coll"> <?php echo $task->task_title;?></td>
+
 	        		<?php foreach ($task->cnt_vols as $k2 => $cnt):?>
 		        		 <td class="a21_dinam_coll"> 
 		        		 <?php 
@@ -1699,35 +1705,43 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		 // echo "<br>";
 
 						/* **** hide/show btn signup **** */
+
+						 $vol_hide_btn = false;
+
 		        		 if( !empty($task->ids_vols[$k2]) ){
 		        			 // echo "-----IDS VOLS---<br>";
 		        		  	 // var_dump($task->ids_vols[$k2]);
-		        		  	 // echo "<br>";
-		        			 // var_dump( count($task->ids_vols[$k2]));
+		        		  // 	 echo "cnt=".$cnt."<br>";
+		        			 // echo 'count($task->ids_vols[$k2] ='; var_dump( count($task->ids_vols[$k2]));
+		        			 // echo "<br>";
+		        			 // echo '$task->ids_vols[$k2] ='; var_dump( $task->ids_vols[$k2]);
 		        			 // echo "<br>";
 
-			        		 if( $cnt == count($task->ids_vols[$k2])) $vol_hide_btn = true;
+			        		 if( $cnt == count($task->ids_vols[$k2]) ) $vol_hide_btn = true;
 			        		 else{
 			        		 	 // if( !empty($task->ids_vols[$k2]) ):
 					        		 foreach ($task->ids_vols[$k2] as $vol_id) {	
-	 		 	 			        	 echo " cur_user ".$cur_user->ID." = vol_id ".$vol_id;
-				 		        		 echo "<br>";
+	 		 	 			        	 // echo "<br>cur_user=".$cur_user->ID.", vol_id=".$vol_id;
+				 		        		 // echo "<br>";
 		        		 	
 					        		 	// hide if cur_user sign up to event task in cur time
 					   				 	if($cur_user->ID == $vol_id) $vol_hide_btn = true; 
-					   				 	else $vol_hide_btn = false;
+					   				 	// else $vol_hide_btn = false;
 					        		 }
 				        		 // endif;
 			        	 	}
 			        	 } else $vol_hide_btn = false;
+
+ 		        		 // echo '<br>vol_hide_btn ='; var_dump($vol_hide_btn);
  		        		  // if only one volunteer..e.g. 1:: or :5:
-		        		  if( !is_array($arr_vols_cur_task) && !empty($arr_vols_cur_task) ) $vol_hide_btn = true;
+		        		  // if( !is_array($arr_vols_cur_task) && !empty($arr_vols_cur_task)) $vol_hide_btn = true;
+		        		  if( !is_array($arr_vols_cur_task) && !empty($arr_vols_cur_task) && $arr_vols_cur_task == $cur_user->ID) $vol_hide_btn = true;
 
 						/* **** hide/show btn signup **** */
 
 			        	 // print_r($task->ids_vols[$k2]);
 
-		        		 // echo 'vol_hide_btn '; var_dump($vol_hide_btn);
+		        		 // echo '<br>vol_hide_btn ='; var_dump($vol_hide_btn);
 		        		 if(!$vol_hide_btn):
 		        		 ?>
 		        		 <button class="a21_add_new_volunteer" data-i="<?php echo $k2;?>" data-id="<?php echo $cur_user->ID;?>" data-nick="<?php echo $cur_user->data->user_nicename;?>">signup</button>
@@ -1742,14 +1756,15 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		  echo "<span class='vol_cnt'>".$cnt."</span> "; echo $need."<br>"; 
 		        		  // alex_debug(0,1,"event_tasks[k]->ids_vols",$event_tasks[$k]->ids_vols);
 		        		  // echo "event_tasks[k]->ids_vols[k2]=".$arr_vols_cur_task;
-		        		  echo "<br>";
+		        		  // echo "<br>";
 		        		  // var_dump($arr_vols_cur_task);
-		        		  echo "<br>";
+		        		  // echo "<br>";
+
 		        		  // if only one volunteer..e.g. 1:: or :5:
-		        		  if( !is_array($arr_vols_cur_task) && !empty($arr_vols_cur_task) ) echo $member_name = bp_core_get_username($member_id)."<br>";
+		        		  if( !is_array($arr_vols_cur_task) && !empty($arr_vols_cur_task) ) echo "id ".$member_id."-".$member_name = bp_core_get_username($arr_vols_cur_task)."<br>";
 
 		        		  foreach ($arr_vols_cur_task as $member_id) {
-	  	        		      echo $member_id."-".$member_name = bp_core_get_username($member_id)."<br>";
+	  	        		      if(!empty($member_id) ) echo "id ".$member_id."-".$member_name = bp_core_get_username($member_id)."<br>";
 		        		  }
 		        		  ?> 
 		        		  </p>
