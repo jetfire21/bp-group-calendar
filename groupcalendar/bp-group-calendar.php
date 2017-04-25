@@ -1909,8 +1909,6 @@ function bp_group_calendar_widget_create_event( $date ) {
 			<table id="a21_bgc_tasks_shifts" style="margin-bottom: 5px;">
 			<tr class="title_columns">
 				<th>Task item</th>
-				<!-- <th>SHIFT #1 (edit time details)</th> -->
-				<!-- <th>SHIFT #2 (edit time details)</th> -->
 			</tr>
 <!--
 			<tr>
@@ -1920,8 +1918,16 @@ function bp_group_calendar_widget_create_event( $date ) {
 			</tr>
 -->
 			</table>
-			<div id="a21_bgc_add_new_row" style="cursor: pointer;">+ Add New Row</div>
-			<div id="a21_bgc_add_new_column" style="cursor: pointer;">+ Add New Column</div>
+			<div class="wrap_btns_for_event_tasks">
+				<div class="d_btn_left">
+					<div id="a21_bgc_add_new_row" style="cursor: pointer;">+ Add New Row</div>
+					<div id="a21_bgc_add_new_column" style="cursor: pointer;">+ Add New Column</div>
+				</div>
+				<div class="d_btn_right">
+					<div id="a21_bgc_del_row" style="cursor: pointer;">- Delete Row</div>
+					<div id="a21_bgc_del_column" style="cursor: pointer;">- Delete Column</div>
+				</div>
+			</div>
 			<br>
 			<label for="thank_you"><?php _e( 'Event Completion Thank-you Message', 'groupcalendar' ); ?></label>
 			<!-- <input name="thank_you" id="thank_you" value="" type="text"> -->
