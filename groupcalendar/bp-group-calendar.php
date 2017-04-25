@@ -1717,6 +1717,8 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		 <td class="a21_dinam_coll"> 
 		        		 <?php 
 		        		 $arr_vols_cur_task = $event_tasks[$k]->ids_vols[$k2];
+		        		 // var_dump($arr_vols_cur_task);
+
 		        		 // echo "k2=".$k2."<br>";
 		        		 // echo " cnt ".$cnt." == task->ids_vols[k2] $k2, ".count($task->ids_vols[$k2]);
 		        		 // echo "<br>";
@@ -1757,21 +1759,26 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 						/* **** hide/show btn signup **** */
 
 			        	 // print_r($task->ids_vols[$k2]);
+						$cnt_fill_el_arr_vols = 0;
+						foreach ($arr_vols_cur_task as $v) {
+							if( !empty($v)) $cnt_fill_el_arr_vols++;
+						};
+		        		  // $cur_count = count($arr_vols_cur_task);
+		        		  $cur_count = $cnt_fill_el_arr_vols;
+		        		  $still_need_count = $cnt - $cur_count;
 
 		        		 // echo '<br>vol_hide_btn ='; var_dump($vol_hide_btn);
 		        		 if(!$vol_hide_btn):
 		        		 ?>
-		        		 <button class="a21_add_new_volunteer" data-i="<?php echo $k2;?>" data-id="<?php echo $cur_user->ID;?>" data-nick="<?php echo $cur_user->data->user_nicename;?>">signup</button>
+			        		 <button class="a21_add_new_volunteer" data-s-need-cnt="<?php echo $still_need_count;?>" data-i="<?php echo $k2;?>" data-id="<?php echo $cur_user->ID;?>" data-nick="<?php echo $cur_user->data->user_nicename;?>">signup</button>
 		        		 <?php endif;?>
-		        		 <p>
+
 		        		  <?php 
 		        		  // alex_debug(0,1,"array vols cur task",$arr_vols_cur_task);
-		        		  $cur_count = count($arr_vols_cur_task);
 		        		  echo "<p class='a21-system-message'>current count vols=".$cur_count."</p>";
 		        		  if($cur_count >= $cnt) echo "<p class='a21-system-message'>full</p>";
 		        		  echo "<p class='a21-system-message'>total for cur task & time=".$cnt."</p>";
 		        		  // echo "<br>";
-		        		  $still_need_count = $cnt - $cur_count;
 		        		  if( $still_need_count != 0 ) { echo "<span class='vol_cnt'>".$still_need_count."</span> "; echo $need."<br>"; }
 		        		  // alex_debug(0,1,"event_tasks[k]->ids_vols",$event_tasks[$k]->ids_vols);
 		        		  // echo "event_tasks[k]->ids_vols[k2]=".$arr_vols_cur_task;
@@ -1786,7 +1793,6 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 	  	        		      if(!empty($member_id) ) echo "id ".$member_id."-".$member_name = bp_core_get_username($member_id)."<br>";
 		        		  }
 		        		  ?> 
-		        		  </p>
 		        		 </td>
 		      		 <?php endforeach;?>
     	        </tr>
