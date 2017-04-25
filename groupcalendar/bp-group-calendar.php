@@ -1769,8 +1769,10 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		  $cur_count = count($arr_vols_cur_task);
 		        		  echo "<p class='a21-system-message'>current count vols=".$cur_count."</p>";
 		        		  if($cur_count >= $cnt) echo "<p class='a21-system-message'>full</p>";
+		        		  echo "<p class='a21-system-message'>total for cur task & time=".$cnt."</p>";
 		        		  // echo "<br>";
-		        		  echo "<span class='vol_cnt'>".$cnt."</span> "; echo $need."<br>"; 
+		        		  $still_need_count = $cnt - $cur_count;
+		        		  if( $still_need_count != 0 ) { echo "<span class='vol_cnt'>".$still_need_count."</span> "; echo $need."<br>"; }
 		        		  // alex_debug(0,1,"event_tasks[k]->ids_vols",$event_tasks[$k]->ids_vols);
 		        		  // echo "event_tasks[k]->ids_vols[k2]=".$arr_vols_cur_task;
 		        		  // echo "<br>";
@@ -1941,8 +1943,8 @@ function bp_group_calendar_widget_create_event( $date ) {
 					<div id="a21_bgc_add_new_column" style="cursor: pointer;">+ Add New Column</div>
 				</div>
 				<div class="d_btn_right">
-					<div id="a21_bgc_del_row" style="cursor: pointer;">- Delete Row</div>
-					<div id="a21_bgc_del_column" style="cursor: pointer;">- Delete Column</div>
+					<div id="a21_bgc_del_row" style="cursor: pointer;">[x] Delete Row</div>
+					<div id="a21_bgc_del_column" style="cursor: pointer;">[x] Delete Column</div>
 				</div>
 			</div>
 			<br>
