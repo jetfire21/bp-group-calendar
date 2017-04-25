@@ -171,6 +171,8 @@ function bp_group_calendar_global_install() {
 	if ( get_site_option( "bp_group_calendar_installed" ) == "yes" ) {
 		// do nothing
 	} else {
+		// ALTER TABLE `wp8k_bp_groups_calendars` ADD `thank_you` TEXT NOT NULL AFTER `last_edited_stamp`, ADD `total_vols` SMALLINT UNSIGNED NOT NULL AFTER `thank_you`;
+
 		$bp_group_calendar_table1 = "CREATE TABLE IF NOT EXISTS `" . $wpdb->base_prefix . "bp_groups_calendars` (
                                   `id` bigint(20) unsigned NOT NULL auto_increment,
                                   `group_id` bigint(20) NOT NULL default '0',
@@ -184,6 +186,8 @@ function bp_group_calendar_global_install() {
                                   `created_stamp` bigint(30) NOT NULL,
                                   `last_edited_id` bigint(20) NOT NULL default '0',
                                   `last_edited_stamp` bigint(30) NOT NULL,
+                                  `thank_you` TEXT NOT NULL,
+                                  `total_vols` SMALLINT UNSIGNED NOT NULL,
                                   PRIMARY KEY  (`id`)
                                 ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
@@ -378,11 +382,12 @@ function bp_group_calendar_event_save() {
 
 	if ( isset( $_POST['create-event'] ) ) {
 
-		/**** a21 ******/
+		/**** a21 create event ******/
 		
 		// alex_debug(1,1,"",$_REQUEST);
 		// alex_debug(1,1,"",$_FILES);
 		// alex_debug(1,1,"",$_POST);
+		// exit;
 
 
 
@@ -513,10 +518,14 @@ function bp_group_calendar_event_save() {
 			$event_slug = strtolower($event_title);
 			$event_slug = str_replace(" ", "-", $event_slug);
 
+			/* **** as21 **** */
+			$thank_you = sanitize_text_field($_POST['thank_you']);
+			$total_volunteers =(int)$_POST['total-volunteers'];
+
 			$query = $wpdb->prepare( "INSERT INTO " . $wpdb->base_prefix . "bp_groups_calendars
-                            	( group_id, user_id, event_time, event_slug, event_title, event_description, event_location, event_map, created_stamp, last_edited_id, last_edited_stamp )
-                            	VALUES ( %d, %d, %s, %s, %s, %s, %s, %d, %d, %d, %d )",
-				$group_id, $current_user->ID, $event_date, $event_slug, $event_title, $event_description, $event_location, $event_map, current_time( 'timestamp', true ), $current_user->ID, time() );
+                            	( group_id, user_id, event_time, event_slug, event_title, event_description, event_location, event_map, created_stamp, last_edited_id, last_edited_stamp,thank_you,total_vols )
+                            	VALUES ( %d, %d, %s, %s, %s, %s, %s, %d, %d, %d, %d, %s, %d)",
+				$group_id, $current_user->ID, $event_date, $event_slug, $event_title, $event_description, $event_location, $event_map, current_time( 'timestamp', true ), $current_user->ID, time(),$thank_you,$total_volunteers );
 
 			if ( $wpdb->query( $query ) ) {
 				$new_id = $wpdb->insert_id;
@@ -608,13 +617,31 @@ function bp_group_calendar_event_save() {
 				     $wpdb->query($times_sql);
 		            // echo "<br>".$sql;
 
+				     /*
+					if(!empty($_POST['thank_you'])) {
+
+						$thank_you = sanitize_text_field($_POST['thank_you']);
+						$query = $wpdb->prepare( "INSERT INTO " . $wpdb->prefix . "bp_groups_groupmeta
+							( group_id,meta_key,meta_value)
+							VALUES ( %d,%s, %s )", $new_id, 'a21_bgc_event_thank_you',$thank_you );
+						$wpdb->query( $query );
+					}
+
+					if(!empty($_POST['total-volunteers'])) {
+
+						$total_volunteers =(int)$_POST['total-volunteers'];
+						$query = $wpdb->prepare( "INSERT INTO " . $wpdb->prefix . "bp_groups_groupmeta
+							( group_id,meta_key,meta_value)
+							VALUES ( %d,%s, %d )", $new_id, 'a21_bgc_event_total_volunteers',$total_volunteers );
+						$wpdb->query( $query );
+					}
+					*/
+
 					/* **** option 3 **** */
 
 					/* **** as21 option 1**** *
 					if(!empty($_POST['total-volunteers'])) $esc_post['new_event_tasks']['total-volunteers'] = (int)$_POST['total-volunteers'];
 
-					// $_POST['thank_you'] = sanitize_text_field($_POST['thank_you']);
-					// $_POST['total-volunteers'] = (int)$_POST['total-volunteers'];
 
 					$ser_str = serialize($esc_post['new_event_tasks']);
 					// alex_debug(0,1,"",unserialize($ser));
@@ -665,18 +692,6 @@ function bp_group_calendar_event_save() {
 				/**** a21 tasks post ******/
 
 
-				// if(!empty($_POST['thank_you'])) {
-				// 	$query = $wpdb->prepare( "INSERT INTO " . $wpdb->prefix . "bp_groups_groupmeta
-				// 		( group_id,meta_key,meta_value)
-				// 		VALUES ( %d,%s, %s )", $new_id, 'a21_bgc_event_thank_you',$_POST['thank_you'] );
-				// 	$wpdb->query( $query );
-				// }
-				// if(!empty($_POST['total-volunteers'])) {
-				// 	$query = $wpdb->prepare( "INSERT INTO " . $wpdb->prefix . "bp_groups_groupmeta
-				// 		( group_id,meta_key,meta_value)
-				// 		VALUES ( %d,%s, %s )", $new_id, 'a21_bgc_event_total-volunteers',$_POST['total-volunteers'] );
-				// 	$wpdb->query( $query );
-				// }
 
 
 				/**** a21 ******/
@@ -1599,7 +1614,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 		if($event_image) {?> <img src="<?php echo $event_image;?>" alt=""><?php }
 
-		alex_debug(0,1,"orig arr tasks",$event_tasks);
+		// alex_debug(0,1,"orig arr tasks",$event_tasks);
 		// alex_debug(0,1,"",$event_times);
 
 		/* **** as21 parse ids_vols & count vols**** */
@@ -1628,8 +1643,8 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 					// $event_tasks[$k]->ids_cnt[$k2] = $ids_arr;
 					// $event_tasks[$k]->ids_cnt[$k2]['cnt'] = $event_tasks[$k]->cnt_vols[$k2];
 					// $event_tasks[$k]->ids_cnt[$k2]['cnt'] = $event_tasks[$k]->cnt_vols[$k2];
-					echo "<br>";
-					echo "====k2-".$k2." v-".$v."<br>";
+					// echo "<br>";
+					// echo "====k2-".$k2." v-".$v."<br>";
 				}
 
 			}else { unset($task->ids_vols);}
@@ -1637,14 +1652,14 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		}
 		/* **** as21 parse ids_vols & count vols**** */
 
-		alex_debug(0,1,"arr tasks after parse",$event_tasks);
+		// alex_debug(0,1,"arr tasks after parse",$event_tasks);
 
 
 		// echo "<br>is_login "; var_dump(is_user_logged_in());
 		if(is_user_logged_in()){
 			$cur_user = wp_get_current_user();
-			echo "<br>".$cur_user->ID;
-			echo "<br>".$cur_user->data->user_login;
+			// echo "<br>".$cur_user->ID;
+			// echo "<br>".$cur_user->data->user_login;
 		}
 
 		// alex_debug(0,1,"",$cur_user);
@@ -1652,9 +1667,11 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		$need = " Needed";
 		if( !empty($event_tasks)):?>
 
-		    <h6 class="event-label">Total Event Volunteers Needed:</h6> <?php echo $event_tasks['total-volunteers'].$need; 			
-		    unset($event_tasks['total-volunteers']); ?>
-			
+		    <h6 class="event-label">Total Event Volunteers Needed:</h6> 
+		    <?php if( !empty($event->total_vols) ) echo $event->total_vols;?>
+		    <h6 class="event-label">Thank-you Message:</h6> <p class='a21-system-message'>for testing</p>
+		    <?php if( !empty($event->thank_you) ) echo $event->thank_you;?>
+				
 			<h6 class="event-label">Event Tasks & Shifts:</h6><p class='a21-system-message'>Test mode, still under development</p>
 <!-- 
 			<table id="a21_bgc_tasks_shifts" style="margin-bottom: 5px;">
