@@ -78,19 +78,46 @@ function a21_bgc_add_new_volunteer(){
 	// echo "wp ajax success!";
 	echo "<br>user_id ".$_POST['user_id'];
 	echo "<br>task_id ".$_POST['task_id'];
-	echo "<br>i ".$_POST['i'];
+	$num_cur_column = (int)$_POST['i'];
+	echo "<br>i ".$num_cur_column;
 	echo "<br>";
 	global $wpdb;
-	$event_task = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM bp_taks WHERE id = %d", $_POST['task_id'] ) );
+	$event_task = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE id = %d", $_POST['task_id'] ) );
 	print_r($event_task);
+	var_dump($event_task->ids_vols);
+	if(empty($event_task->ids_vols)) {
+		// if ids_vols is empty,then insert current memeber_id 
+		echo "\r\nids_vols-empty";
+	    $column_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}bp_groups_bgc_time");
+	    echo "\r\ncolumn_count=".$column_count;
+	    for($i=0;$i<$column_count;$i++){
+	    	// format record ids_vols 2,3:3,4,2:2,1,2 	// ::1 or 1:: or :1:
+	    	if($i==$num_cur_column) { $val .= $_POST['user_id'];}
+	    	else { $val .= ""; if($i < $column_count) $val .= ":";}
+	    	// if($i==$num_cur_column) { $val .= $_POST['user_id']; if($i == 0) $val .= ":";}
+	    	// else { $val .= ""; if($i < $column_count) $val .= "0:";}
+	    }
+	    echo "\r\nval ids_vols=".$val;
+		$wpdb->update( $wpdb->prefix."bp_groups_bgc_tasks",
+			array( 'ids_vols' => $val ),
+			array( 'id' => $_POST['task_id'] ),
+			array( '%s' ),
+			array( '%d' )
+		);
+
+	}
+	// exit;
 	if(!empty($event_task)){
 		$ids_vols = explode(":",$event_task->ids_vols);
 		print_r($ids_vols);
-		$ids_vols[$_POST['i']] .= ",".$_POST['user_id'];
+		echo "arr vols cur task=".$ids_vols[$_POST['i']];
+		if( !empty($ids_vols[$_POST['i']]) ) $ids_vols[$_POST['i']] .= ",".$_POST['user_id'];
+		else $ids_vols[$_POST['i']] = $_POST['user_id'];
 		print_r($ids_vols);
 		echo $ids_vols = implode(":", $ids_vols);
+		// exit;
 
-		$wpdb->update( 'bp_taks',
+		$wpdb->update( $wpdb->prefix."bp_groups_bgc_tasks",
 			array( 'ids_vols' => $ids_vols ),
 			array( 'id' => $_POST['task_id'] ),
 			array( '%s' ),
@@ -98,7 +125,7 @@ function a21_bgc_add_new_volunteer(){
 		);
 
 	}
-	// $ids_ = $wpdb->get_results( "SELECT * FROM bp_taks WHERE event_id='11'");
+	// $ids_ = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id='11'");
 	// $wpdb->update( $wpdb->posts,
 	// 	array( 'post_title' => $title, 'post_name' => $class , 'post_content'=> $content, 'post_excerpt'=>$date,'menu_order'=>$alex_tl_grp_id ),
 	// 	array( 'ID' => $id ),
@@ -1570,8 +1597,8 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 		if($event_image) {?> <img src="<?php echo $event_image;?>" alt=""><?php }
 
-		alex_debug(0,1,"",$event_tasks);
-		alex_debug(0,1,"",$event_times);
+		alex_debug(0,1,"orig arr tasks",$event_tasks);
+		// alex_debug(0,1,"",$event_times);
 
 		/* **** as21 parse ids_vols & count vols**** */
 
@@ -1598,7 +1625,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 					// $event_tasks[$k]->ids_cnt[$k2]['cnt'] = $event_tasks[$k]->cnt_vols[$k2];
 					// $event_tasks[$k]->ids_cnt[$k2]['cnt'] = $event_tasks[$k]->cnt_vols[$k2];
 					echo "<br>";
-					// echo $k2." ".$v."<br>";
+					echo "====k2-".$k2." v-".$v."<br>";
 				}
 
 			}else { unset($task->ids_vols);}
@@ -1606,7 +1633,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		}
 		/* **** as21 parse ids_vols & count vols**** */
 
-		alex_debug(0,1,"",$event_tasks);
+		alex_debug(0,1,"arr tasks after parse",$event_tasks);
 
 
 		// echo "<br>is_login "; var_dump(is_user_logged_in());
@@ -1624,8 +1651,8 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		    <h6 class="event-label">Total Event Volunteers Needed:</h6> <?php echo $event_tasks['total-volunteers'].$need; 			
 		    unset($event_tasks['total-volunteers']); ?>
 			
-			<h6 class="event-label">Event Tasks & Shifts:</h6>
-
+			<h6 class="event-label">Event Tasks & Shifts:</h6><p class='a21-system-message'>Test mode, still under development</p>
+<!-- 
 			<table id="a21_bgc_tasks_shifts" style="margin-bottom: 5px;">
 	        	<tr class="title_columns">
 	        	   <th class="a21_dinam_th_coll"> Task item </th>
@@ -1648,7 +1675,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
     	        </tr>
 		        <?php endforeach;?>
 			</table>
-
+ -->
 			<?php /* **** as21 parse ids_vols & count vols - output **** */ ?>
 
 			<table id="a21_bgc_tasks_shifts" style="margin-bottom: 5px;">
@@ -1666,13 +1693,18 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 	        		<?php foreach ($task->cnt_vols as $k2 => $cnt):?>
 		        		 <td class="a21_dinam_coll"> 
 		        		 <?php 
-		        		 echo " cnt ".$cnt." == task->ids_vols[k2] $k2, ".count($task->ids_vols[$k2]);
-		        		 echo "<br>";
+		        		 $arr_vols_cur_task = $event_tasks[$k]->ids_vols[$k2];
+		        		 // echo "k2=".$k2."<br>";
+		        		 // echo " cnt ".$cnt." == task->ids_vols[k2] $k2, ".count($task->ids_vols[$k2]);
+		        		 // echo "<br>";
 
+						/* **** hide/show btn signup **** */
 		        		 if( !empty($task->ids_vols[$k2]) ){
-		        			 echo "-----IDS VOLS---";
-		        		  	 var_dump($task->ids_vols[$k2]);
-		        			 var_dump( count($task->ids_vols[$k2]));
+		        			 // echo "-----IDS VOLS---<br>";
+		        		  	 // var_dump($task->ids_vols[$k2]);
+		        		  	 // echo "<br>";
+		        			 // var_dump( count($task->ids_vols[$k2]));
+		        			 // echo "<br>";
 
 			        		 if( $cnt == count($task->ids_vols[$k2])) $vol_hide_btn = true;
 			        		 else{
@@ -1688,25 +1720,36 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 				        		 // endif;
 			        	 	}
 			        	 } else $vol_hide_btn = false;
+ 		        		  // if only one volunteer..e.g. 1:: or :5:
+		        		  if( !is_array($arr_vols_cur_task) && !empty($arr_vols_cur_task) ) $vol_hide_btn = true;
 
-			        	 print_r($task->ids_vols[$k2]);
+						/* **** hide/show btn signup **** */
 
-		        		 echo 'vol_hide_btn '; var_dump($vol_hide_btn);
+			        	 // print_r($task->ids_vols[$k2]);
+
+		        		 // echo 'vol_hide_btn '; var_dump($vol_hide_btn);
 		        		 if(!$vol_hide_btn):
 		        		 ?>
-		        		 <button class="a21_add_new_volunteer" data-i="<?php echo $k2;?>" data-id="<?php echo $cur_user->ID;?>" data-nick="<?php echo $cur_user->data->user_login;?>">signup</button>
+		        		 <button class="a21_add_new_volunteer" data-i="<?php echo $k2;?>" data-id="<?php echo $cur_user->ID;?>" data-nick="<?php echo $cur_user->data->user_nicename;?>">signup</button>
 		        		 <?php endif;?>
 		        		 <p>
 		        		  <?php 
-		        		  $cur_count = count($event_tasks[$k]->ids_vols[$k2]);
-		        		  echo "current count=".$cur_count;
-		        		  echo "<br>";
-		        		  if($cnt >= $cur_count) echo "full";
-		        		  echo "<br>";
+		        		  // alex_debug(0,1,"array vols cur task",$arr_vols_cur_task);
+		        		  $cur_count = count($arr_vols_cur_task);
+		        		  echo "<p class='a21-system-message'>current count vols=".$cur_count."</p>";
+		        		  if($cur_count >= $cnt) echo "<p class='a21-system-message'>full</p>";
+		        		  // echo "<br>";
 		        		  echo "<span class='vol_cnt'>".$cnt."</span> "; echo $need."<br>"; 
-		        		  // print_r($event_tasks[$k]->ids_vols[$k2]);
-		        		  foreach ($event_tasks[$k]->ids_vols[$k2] as $member_id) {
-	  	        		      echo $member_name = bp_core_get_username($member_id)."<br>";
+		        		  // alex_debug(0,1,"event_tasks[k]->ids_vols",$event_tasks[$k]->ids_vols);
+		        		  // echo "event_tasks[k]->ids_vols[k2]=".$arr_vols_cur_task;
+		        		  echo "<br>";
+		        		  // var_dump($arr_vols_cur_task);
+		        		  echo "<br>";
+		        		  // if only one volunteer..e.g. 1:: or :5:
+		        		  if( !is_array($arr_vols_cur_task) && !empty($arr_vols_cur_task) ) echo $member_name = bp_core_get_username($member_id)."<br>";
+
+		        		  foreach ($arr_vols_cur_task as $member_id) {
+	  	        		      echo $member_id."-".$member_name = bp_core_get_username($member_id)."<br>";
 		        		  }
 		        		  ?> 
 		        		  </p>
