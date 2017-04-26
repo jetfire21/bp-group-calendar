@@ -1714,9 +1714,22 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        	<td class="a21_dinam_coll"> <?php echo $task->task_title;?></td>
 
 	        		<?php foreach ($task->cnt_vols as $k2 => $cnt):?>
-		        		 <td class="a21_dinam_coll"> 
-		        		 <?php 
+	        			<?php
 		        		 $arr_vols_cur_task = $event_tasks[$k]->ids_vols[$k2];
+ 			        	
+ 			        	 // print_r($task->ids_vols[$k2]);
+							$cnt_fill_el_arr_vols = 0;
+							foreach ($arr_vols_cur_task as $v) {
+								if( !empty($v)) $cnt_fill_el_arr_vols++;
+							};
+							
+		        		  // $cur_count = count($arr_vols_cur_task);
+		        		  $cur_count = $cnt_fill_el_arr_vols;
+		        		  $still_need_count = $cnt - $cur_count;
+
+	        			?>
+		        		 <td class="a21_dinam_coll <?php if($cur_count >= $cnt) echo 'red-cell'; if($still_need_count == 1) echo 'yellow-cell';?>"> 
+		        		 <?php 
 		        		 // var_dump($arr_vols_cur_task);
 
 		        		 // echo "k2=".$k2."<br>";
@@ -1758,14 +1771,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 						/* **** hide/show btn signup **** */
 
-			        	 // print_r($task->ids_vols[$k2]);
-						$cnt_fill_el_arr_vols = 0;
-						foreach ($arr_vols_cur_task as $v) {
-							if( !empty($v)) $cnt_fill_el_arr_vols++;
-						};
-		        		  // $cur_count = count($arr_vols_cur_task);
-		        		  $cur_count = $cnt_fill_el_arr_vols;
-		        		  $still_need_count = $cnt - $cur_count;
+
 
 		        		 // echo '<br>vol_hide_btn ='; var_dump($vol_hide_btn);
 		        		 if(!$vol_hide_btn):
