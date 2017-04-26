@@ -1761,6 +1761,8 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 				<?php endif; ?>
 			</div>
 		<?php endif; ?>
+		
+			<p class="a21-system-box">Additional custom fields is still under development. Coming soon. Now you can only add or edit the image</p>
 
 		<?php
 		/**** a21_display******/
@@ -1800,7 +1802,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 			// $ids_vols = explode(":",$task->ids_vols);
 			// $event_tasks[$k]->ids_vols = $ids_vols;
 			// echo "==== inside loop as21 parse ids_vols & count vols ====<br>";
-			print_r($task);
+			// print_r($task);
 
 			if( !empty($task->ids_vols) ) {
 
@@ -1891,7 +1893,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 	        			<?php
 	        			// this array can have empty values ""
 		        		 $arr_vols_cur_task = $event_tasks[$k]->ids_vols[$k2]; 			        	
- 			        	 alex_debug(0,1,"",$arr_vols_cur_task);
+ 			        	 // alex_debug(0,1,"",$arr_vols_cur_task);
 
 							$cnt_fill_el_arr_vols = 0;
 							foreach ($arr_vols_cur_task as $v) {
@@ -2122,6 +2124,11 @@ function bp_group_calendar_widget_create_event( $date ) {
 
 			<label for="event-loc"><?php _e( 'Location', 'groupcalendar' ); ?></label>
 			<input name="event-loc" id="event-loc" value="" type="text">
+			<label for="event-map"><?php _e( 'Show Map Link?', 'groupcalendar' ); ?>
+				<input name="event-map" id="event-map" value="1" type="checkbox" checked="checked"/>
+				<small><?php _e( '(Note: Location must be an address)', 'groupcalendar' ); ?></small>
+			</label>
+
 			
 			<?php /**** a21 ******/?>
 			<?php
@@ -2167,10 +2174,6 @@ function bp_group_calendar_widget_create_event( $date ) {
 			<textarea name="thank_you" id="thank_you" cols="30" rows="10"></textarea>
 			<?php /**** a21 ******/?>
 
-			<label for="event-map"><?php _e( 'Show Map Link?', 'groupcalendar' ); ?>
-				<input name="event-map" id="event-map" value="1" type="checkbox" checked="checked"/>
-				<small><?php _e( '(Note: Location must be an address)', 'groupcalendar' ); ?></small>
-			</label>
 				
 			<input name="create-event" id="create-event" value="1" type="hidden">
 			<input name="group-id" id="group-id" value="<?php echo $bp->groups->current_group->id; ?>" type="hidden">
@@ -2371,6 +2374,8 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 				<input name="event-map" id="event-map" value="1" type="checkbox"<?php echo $event_map; ?> />
 				<small><?php _e( '(Note: Location must be an address)', 'groupcalendar' ); ?></small>
 			</label>
+
+			<p class="a21-system-box">Additional custom fields is still under development. Coming soon. Now you can only add or edit the image</p>
 
 			<?php if ( $event_id ) : ?>
 				<input name="event-id" id="event-id" value="<?php echo $event_id; ?>" type="hidden">
