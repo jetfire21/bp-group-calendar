@@ -95,7 +95,7 @@ function a21_cancel_my_attandance(){
 
 		$cnt_vols = explode(",",$event_task->cnt_vols);
 		$cnt_primary_vols = $cnt_vols[$i];
-		$debug = "<p class='a21-system-message'>cnt_primary_vols=".$cnt_primary_vols."</p>";
+		$debug = "cnt_primary_vols=".$cnt_primary_vols."<br>";
 		// echo $ids_vols;
 
 		$ids_vols = explode(":",$ids_vols);
@@ -106,53 +106,13 @@ function a21_cancel_my_attandance(){
 		$ids_vols[$i] = preg_replace("/^,/i", "", $ids_vols[$i]); // delete first ,
 		$ids_vols[$i] = preg_replace("/,$/i", "", $ids_vols[$i]); // delete last ,
 
-		// if many vols then it array, if one vol then it string
 		if( preg_match("#,#i", $ids_vols[$i]) ) {
 			$cnt_vols_signup_now = explode(",", $ids_vols[$i] );
 			$cnt_vols_signup_now = count($cnt_vols_signup_now);
-		}else { 
-			if( !empty($ids_vols[$i]) ) $cnt_vols_signup_now = 1;
-			else $cnt_vols_signup_now = 0;
-		}
-		// $js['cnt_vols_signup_now'] = $cnt_vols_signup_now;
-		$debug .= "<p class='a21-system-message'>cnt_vols_signup_now =".$cnt_vols_signup_now."</p>";
-		$still_need_count = $cnt_primary_vols - $cnt_vols_signup_now;
-		$js['cnt_vols_signup_now'] = $cnt_vols_signup_now;
+		}else $cnt_vols_signup_now = 1;
 
-		$debug .= '<button class="a21_add_new_volunteer" data-s-need-cnt="'.$still_need_count.'" data-i="'.$i.'" data-id="'.$user_id.'" data-nick="test">signup</button><p><span class="vol_cnt">'.$still_need_count.'</span> Needed</p>';
-
-		function get_user_link_and_avatar($user_id, $iter = false){
-
-			// $debug .= "<br>function get_user_link_and_avatar<br>";
-		  	if( ($iter && $iter == 1) or !$iter) $debug .= "Attendees: ";
-		  	$member_name .= "<p class='a21-system-message'>id ".$user_id."-".bp_core_get_username($user_id)."</p>";
-			$member_link = bp_core_get_userlink($user_id,false,true);	
-			$member_avatar = bp_core_fetch_avatar( array('item_id'=>$user_id, 'width'=>"30",'html'=>true));
-			$debug .= "<a class='link-user-id-".$user_id."' href='".$member_link."' >".$member_avatar."</a>";
-			return $debug;
-		}
-		// echo "ids_vols[i]= "; var_dump($ids_vols[$i]);
-	  	// $member_name = '';
-		 // echo "preg_match , " ; var_dump( preg_match("#,#i", $ids_vols[$i]) );
-		 // var_dump($ids_vols[$i]);
-  		// if many vols then it array, if one vol then it string
-		// if( preg_match("#,#i", $ids_vols[$i]) ) {
-		if( strripos($ids_vols[$i],",") !== false ) {
-			 $ii = 1;
-			  $arr_ids_vols = explode(",", $ids_vols[$i] );
-			  foreach ($arr_ids_vols as $member_id) {
-		        if(!empty($member_id) ) {
-					$debug .= get_user_link_and_avatar($member_id, $ii);
-					$ii++;  	        		     
-				 }
-			  }
-		}else{
-			// if only one vol
-			if( !empty($ids_vols[$i]) ) {
-			    $debug .= get_user_link_and_avatar($ids_vols[$i], false);
-			}
-		}  
-
+		$debug .= " cnt_vols_signup_now =".$cnt_vols_signup_now."<br>";
+		// print_r($ids_vols);
 		// echo " after delete user_id from ids_vols= ";
 		$ids_vols = implode(":", $ids_vols);
 		// exit;
@@ -164,10 +124,7 @@ function a21_cancel_my_attandance(){
 			array( '%d' )
 		);
 		// if($query) return true;
-
-		 $debug .= "<p class='a21-system-message'>new markup from ajax</p>";
-		 $js['html'] = $debug;
-		 echo json_encode($js);
+		 echo $debug .= "<h3>new markup</h3>";
 	}
 
 	exit;
