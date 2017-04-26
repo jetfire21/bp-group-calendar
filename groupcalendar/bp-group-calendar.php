@@ -1728,7 +1728,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		  $still_need_count = $cnt - $cur_count;
 
 	        			?>
-		        		 <td class="a21_dinam_coll <?php if($cur_count >= $cnt) echo 'red-cell'; if($still_need_count == 1) echo 'yellow-cell';?>"> 
+		        		 <td class="a21_dinam_coll <?php if($cur_count >= $cnt) echo 'red-cell'; if($cur_count > 0 && $cur_count != $cnt) echo 'yellow-cell';?>"> 
 		        		 <?php 
 		        		 // var_dump($arr_vols_cur_task);
 
