@@ -72,6 +72,50 @@ function a21_bgc_message_thankyou(){
 /* **** as21 NEED FUTURE **** */
 
 /* **** as21 **** */
+add_action('wp_ajax_a21_cancel_my_attandance', 'a21_cancel_my_attandance');
+function a21_cancel_my_attandance(){
+
+	// alex_debug(0,1,"",$_POST);
+	if( !empty($_POST['user_id']) ) $user_id = (int)$_POST['user_id'];
+	if( !empty($_POST['task_id']) ) $task_id = (int)$_POST['task_id'];
+	$i = (int)$_POST['i'];
+
+	// if( !empty($_POST['i']) ) $i = (int)$_POST['i'];
+	// var_dump($i);
+	// var_dump(empty($i));
+	// var_dump( is_int($i) );
+	// var_dump(empty($task_id));
+
+	// 0 is empty value,so use min 1
+	if( !empty($user_id) && !empty($task_id) && is_int($i)){
+		global $wpdb;
+		$ids_vols = $wpdb->get_var( $wpdb->prepare( "SELECT ids_vols FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE id = %d", $task_id ) );
+		// echo $ids_vols;
+
+		$ids_vols = explode(":",$ids_vols);
+		// print_r($ids_vols);
+		// echo "arr vols cur task & cur time column =";
+		// echo $ids_vols[$i]; 	echo "\r\n";
+		$ids_vols[$i] = str_replace($user_id, "", $ids_vols[$i]);
+		$ids_vols[$i] = preg_replace("/^,/i", "", $ids_vols[$i]); // delete first ,
+		$ids_vols[$i] = preg_replace("/,$/i", "", $ids_vols[$i]); // delete last ,
+		// print_r($ids_vols);
+		// echo " after delete user_id from ids_vols= ";
+		$ids_vols = implode(":", $ids_vols);
+		// exit;
+
+		$query = $wpdb->update( $wpdb->prefix."bp_groups_bgc_tasks",
+			array( 'ids_vols' => $ids_vols ),
+			array( 'id' => $task_id),
+			array( '%s' ),
+			array( '%d' )
+		);
+		if($query) return true;
+	}
+
+	exit;
+}
+
 add_action('wp_ajax_a21_bgc_add_new_volunteer', 'a21_bgc_add_new_volunteer');
 function a21_bgc_add_new_volunteer(){
 
@@ -1626,7 +1670,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 			// $ids_vols = explode(":",$task->ids_vols);
 			// $event_tasks[$k]->ids_vols = $ids_vols;
 			// echo "==== inside loop as21 parse ids_vols & count vols ====<br>";
-			// print_r($task->ids_vols);
+			print_r($task);
 
 			if( !empty($task->ids_vols) ) {
 
@@ -1715,9 +1759,10 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 	        		<?php foreach ($task->cnt_vols as $k2 => $cnt):?>
 	        			<?php
-		        		 $arr_vols_cur_task = $event_tasks[$k]->ids_vols[$k2];
- 			        	
- 			        	 // print_r($task->ids_vols[$k2]);
+	        			// this array can have empty values ""
+		        		 $arr_vols_cur_task = $event_tasks[$k]->ids_vols[$k2]; 			        	
+ 			        	 // print_r($arr_vols_cur_task);
+
 							$cnt_fill_el_arr_vols = 0;
 							foreach ($arr_vols_cur_task as $v) {
 								if( !empty($v)) $cnt_fill_el_arr_vols++;
@@ -1739,6 +1784,9 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 						/* **** hide/show btn signup **** */
 
 						 $vol_hide_btn = false;
+						 $show_cancel_my_attandance = false;
+   				 		 $cancel_my_attandance_html = "<button class='a21_cancel_my_attandance' data-s-need-cnt='".$still_need_count."'' data-i='".$k2."' data-task-id='".$task->id."' data-user-id='".$cur_user->ID."'>cancel my attandance</button>";
+
 
 		        		 if( !empty($task->ids_vols[$k2]) ){
 		        			 // echo "-----IDS VOLS---<br>";
@@ -1749,15 +1797,22 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        			 // echo '$task->ids_vols[$k2] ='; var_dump( $task->ids_vols[$k2]);
 		        			 // echo "<br>";
 
-			        		 if( $cnt == count($task->ids_vols[$k2]) ) $vol_hide_btn = true;
-			        		 else{
+			        		 if( $cnt == count($task->ids_vols[$k2]) ) {
+			        		 	$vol_hide_btn = true;
+				        		 foreach ($task->ids_vols[$k2] as $vol_id) {	
+				   				 	if($cur_user->ID == $vol_id) $show_cancel_my_attandance = $cancel_my_attandance_html;					   				 	
+		        				 }
+			        		 }else{
 			        		 	 // if( !empty($task->ids_vols[$k2]) ):
 					        		 foreach ($task->ids_vols[$k2] as $vol_id) {	
 	 		 	 			        	 // echo "<br>cur_user=".$cur_user->ID.", vol_id=".$vol_id;
 				 		        		 // echo "<br>";
 		        		 	
 					        		 	// hide if cur_user sign up to event task in cur time
-					   				 	if($cur_user->ID == $vol_id) $vol_hide_btn = true; 
+					   				 	if($cur_user->ID == $vol_id) {
+					   				 		$vol_hide_btn = true; 
+					   				 		$show_cancel_my_attandance = $cancel_my_attandance_html;					   				 	
+					   				 	}
 					   				 	// else $vol_hide_btn = false;
 					        		 }
 				        		 // endif;
@@ -1793,11 +1848,22 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		  // echo "<br>";
 
 		        		  // if only one volunteer..e.g. 1:: or :5:
-		        		  if( !is_array($arr_vols_cur_task) && !empty($arr_vols_cur_task) ) echo "id ".$member_id."-".$member_name = bp_core_get_username($arr_vols_cur_task)."<br>";
+		        		  if( !is_array($arr_vols_cur_task) && !empty($arr_vols_cur_task) ) echo "id + ".$member_id."-".$member_name = bp_core_get_username($arr_vols_cur_task)."<br>";
 
+		        		  if( !empty($show_cancel_my_attandance) ) echo $show_cancel_my_attandance;
+		        		  $member_name = '';
+		        		  $i = 1;
 		        		  foreach ($arr_vols_cur_task as $member_id) {
-	  	        		      if(!empty($member_id) ) echo "id ".$member_id."-".$member_name = bp_core_get_username($member_id)."<br>";
+	  	        		      if(!empty($member_id) ) {
+	  	        		      	if($i == 1) echo "Attendees: ";
+	  	        		      	$member_name .= "<p class='a21-system-message'>id ".$member_id."-".bp_core_get_username($member_id)."</p>";
+								$member_link = bp_core_get_userlink($member_id,false,true);	
+								$member_avatar = bp_core_fetch_avatar( array('item_id'=>$member_id, 'width'=>"30",'html'=>true));
+								echo "<a class='link-user-id-".$member_id."' href='".$member_link."' >".$member_avatar."</a>";
+								$i++;  	        		     
+							 }
 		        		  }
+		        		  echo $member_name;
 		        		  ?> 
 		        		 </td>
 		      		 <?php endforeach;?>
