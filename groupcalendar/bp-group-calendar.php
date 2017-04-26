@@ -564,7 +564,6 @@ function bp_group_calendar_event_save() {
 		// exit;
 
 
-
 		// exit("=====bp_group_calendar_event_save()====");
 
 		/**** a21 ******/
@@ -613,11 +612,14 @@ function bp_group_calendar_event_save() {
 		
 		/* **** as21 **** */
 
-		$check_dbl_event = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}bp_groups_calendars WHERE event_time=%s AND event_title=%s",$event_date,$event_title));
+		// event now not double
+		// $check_dbl_event = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}bp_groups_calendars WHERE event_time=%s AND event_title=%s",$event_date,$event_title));
+
 		// var_dump($check_event);
-		
+
 		// when event exist
-		if(!is_null($check_dbl_event)) return false;
+		// if(!is_null($check_dbl_event)) return false;
+
 
 		/* **** as21 **** */
 
@@ -639,6 +641,8 @@ function bp_group_calendar_event_save() {
 				}
 			}
 			$event_slug = strtolower($event_title);
+			// $event_slug = str_replace("-", "", $event_slug);
+			// $event_slug = str_replace("- ", "", $event_slug);
 			$event_slug = str_replace(" ", "-", $event_slug);
 
 			$query = $wpdb->prepare( "UPDATE " . $wpdb->base_prefix . "bp_groups_calendars
