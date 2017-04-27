@@ -179,7 +179,7 @@ function a21_cancel_my_attandance(){
 		$still_need_count = $cnt_primary_vols - $cnt_vols_signup_now;
 		$js['cnt_vols_signup_now'] = $cnt_vols_signup_now;
 
-		$debug .= '<button class="a21_add_new_volunteer" data-s-need-cnt="'.$still_need_count.'" data-i="'.$i.'" data-id="'.$user_id.'" data-nick="test">signup</button><p><span class="vol_cnt">'.$still_need_count.'</span> Needed</p>';
+		$debug .= '<button class="a21_add_new_volunteer" data-s-need-cnt="'.$still_need_count.'" data-i="'.$i.'" data-id="'.$user_id.'" data-nick="test">i want to attend</button><p><span class="vol_cnt">'.$still_need_count.'</span> Needed</p>';
 
 		// echo "ids_vols[i]= "; var_dump($ids_vols[$i]);
 	  	// $member_name = '';
@@ -2026,9 +2026,14 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 
 		        		 // echo '<br>vol_hide_btn ='; var_dump($vol_hide_btn);
-		        		 if(!$vol_hide_btn):
+		        		 if(!$vol_hide_btn && is_user_logged_in() ):
 		        		 ?>
-			        		 <button class="a21_add_new_volunteer" data-s-need-cnt="<?php echo $still_need_count;?>" data-i="<?php echo $k2;?>" data-id="<?php echo $cur_user->ID;?>" data-nick="<?php echo $cur_user->data->user_nicename;?>">signup</button>
+			        		 <button class="a21_add_new_volunteer" data-s-need-cnt="<?php echo $still_need_count;?>" data-i="<?php echo $k2;?>" data-id="<?php echo $cur_user->ID;?>" data-nick="<?php echo $cur_user->data->user_nicename;?>">i want to attend</button>
+		        		 <?php endif;?>
+		        		 <?php 
+		        		 if(!$vol_hide_btn && !is_user_logged_in() ):
+		        		 ?>
+			        		 <button class="a21_bgc_user_signup">signup</button>
 		        		 <?php endif;?>
 
 		        		  <?php 
