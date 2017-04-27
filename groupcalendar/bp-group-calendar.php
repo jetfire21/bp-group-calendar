@@ -108,7 +108,7 @@ function as21_bp_group_calendar_event_add_action_message( $user_id, $event_id, $
 	$url = bp_group_calendar_create_event_url( $event_id );
 	$date = bgc_date_display( $event->event_time );
 	$group = groups_get_group( array( 'group_id' => $event->group_id) );
-	
+
 	// echo $url."\r\n ";
 	// echo $date."\r\n ";
 	// echo $group->name."\r\n ";
@@ -666,6 +666,7 @@ function bp_group_calendar_event_save() {
 		// alex_debug(1,1,"",$_REQUEST);
 		// alex_debug(1,1,"",$_FILES);
 		// alex_debug(1,1,"",$_POST);
+		// echo "===as21_save===";
 		// exit;
 
 
@@ -731,6 +732,10 @@ function bp_group_calendar_event_save() {
 		$event_description = wp_filter_post_kses( wpautop( $_POST['event-desc'] ) );
 		$event_location    = esc_attr( strip_tags( trim( $_POST['event-loc'] ) ) );
 		$event_map         = ( isset( $_POST['event-map'] ) && $_POST['event-map'] == 1 ) ? 1 : 0;
+		/* **** as21 **** */
+		$thank_you = sanitize_text_field($_POST['thank_you']);
+		$total_volunteers =(int)$_POST['total-volunteers'];
+
 
 		//editing previous event
 		if ( isset( $_POST['event-id'] ) ) {
@@ -751,9 +756,9 @@ function bp_group_calendar_event_save() {
 			$event_slug = str_replace(" ", "-", $event_slug);
 
 			$query = $wpdb->prepare( "UPDATE " . $wpdb->base_prefix . "bp_groups_calendars
-                            	SET event_time = %s,event_slug = %s, event_title = %s, event_description = %s, event_location = %s, event_map = %d, last_edited_id = %d, last_edited_stamp = %d
+                            	SET event_time = %s,event_slug = %s, event_title = %s, event_description = %s, event_location = %s, event_map = %d, last_edited_id = %d, last_edited_stamp = %d,thank_you = %s, total_vols = %d
                             	WHERE id = %d AND group_id = %d LIMIT 1",
-				$event_date, $event_slug, $event_title, $event_description, $event_location, $event_map, $current_user->ID, current_time( 'timestamp', true ), (int) $_POST['event-id'], $group_id );
+				$event_date, $event_slug, $event_title, $event_description, $event_location, $event_map, $current_user->ID, current_time( 'timestamp', true ), $thank_you, $total_volunteers, (int) $_POST['event-id'], $group_id );
 
 			if ( $wpdb->query( $query ) ) {
 				bp_core_add_message( __( "Event saved", 'groupcalendar' ) );
@@ -801,9 +806,6 @@ function bp_group_calendar_event_save() {
 			$event_slug = strtolower($event_title);
 			$event_slug = str_replace(" ", "-", $event_slug);
 
-			/* **** as21 **** */
-			$thank_you = sanitize_text_field($_POST['thank_you']);
-			$total_volunteers =(int)$_POST['total-volunteers'];
 
 			$query = $wpdb->prepare( "INSERT INTO " . $wpdb->base_prefix . "bp_groups_calendars
                             	( group_id, user_id, event_time, event_slug, event_title, event_description, event_location, event_map, created_stamp, last_edited_id, last_edited_stamp,thank_you,total_vols )
@@ -811,6 +813,7 @@ function bp_group_calendar_event_save() {
 				$group_id, $current_user->ID, $event_date, $event_slug, $event_title, $event_description, $event_location, $event_map, current_time( 'timestamp', true ), $current_user->ID, time(),$thank_you,$total_volunteers );
 
 			if ( $wpdb->query( $query ) ) {
+
 				$new_id = $wpdb->insert_id;
 				bp_core_add_message( __( "Event saved", 'groupcalendar' ) );
 				bp_group_calendar_event_add_action_message( true, $new_id, $event_date, $event_title );
@@ -847,12 +850,15 @@ function bp_group_calendar_event_save() {
 
 				/**** a21 image post ******/
 
+				/**** a21 parse, array new_event_tasks to string for insert/update in db ******/
+
 				if( !empty( $_POST['new_event_tasks']) && $_POST['new_event_tasks'] > 1){
 
 					// sanitizing input data
 					foreach ($_POST['new_event_tasks']['time'] as $k => $time) {
 						$esc_post['new_event_tasks']['time'][$k] = sanitize_text_field($time);
 					}
+
 					foreach ($_POST['new_event_tasks'] as $k => $item) {
 						// echo "k-".$k."<br>";
 						// print_r($item);
@@ -886,10 +892,12 @@ function bp_group_calendar_event_save() {
       				     $cnts = substr($cnts,0, -1);
 				          $sql .= $wpdb->prepare("(%d,%s,%s),", $new_id, $title_task, $cnts); 
 				     endforeach;
+
 				     $sql = substr($sql,0, -1);
 				     $tasks_sql = "INSERT INTO {$wpdb->prefix}bp_groups_bgc_tasks (event_id,task_title,cnt_vols) VALUES ".$sql;
 				     // echo $tasks_sql;
 				     $wpdb->query($tasks_sql);
+
 				     foreach ($times as $v) {
 				     	// $times_str .= $new_id.",".$v.",";
  			            $values .= $wpdb->prepare("(%d,%s),", $new_id, $v);
@@ -899,6 +907,8 @@ function bp_group_calendar_event_save() {
 		            $times_sql = "INSERT INTO {$wpdb->prefix}bp_groups_bgc_time (`event_id`,`time`) VALUES ".$values;
 				     $wpdb->query($times_sql);
 		            // echo "<br>".$sql;
+
+					/**** a21 parse, array new_event_tasks to string for insert/update in db ******/
 
 				     /*
 					if(!empty($_POST['thank_you'])) {
@@ -1899,11 +1909,14 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 		if($event_image) {?> <img src="<?php echo $event_image;?>" alt=""><?php }
 
+
+		/* **** as21 parse ids_vols & count vols**** */
+
+		// echo "as21 parse ids_vols & count vols<hr>";
+
 		// alex_debug(0,1,"orig arr tasks",$event_tasks);
 		// alex_debug(0,1,"",$event_times);
 
-		/* **** as21 parse ids_vols & count vols**** */
-		// echo "as21 parse ids_vols & count vols<hr>";
 		foreach ($event_tasks as $k => $task ) {
 			$cnt_vols = explode(",",$task->cnt_vols);
 			$event_tasks[$k]->cnt_vols = $cnt_vols;
@@ -1935,9 +1948,10 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 			}else { unset($task->ids_vols);}
 
 		}
+		// alex_debug(0,1,"arr tasks after parse",$event_tasks);
+
 		/* **** as21 parse ids_vols & count vols**** */
 
-		// alex_debug(0,1,"arr tasks after parse",$event_tasks);
 
 
 		// echo "<br>is_login "; var_dump(is_user_logged_in());
@@ -1955,7 +1969,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		    <h6 class="event-label">Total Event Volunteers Needed:</h6> 
 		    <?php if( !empty($event->total_vols) ) echo $event->total_vols;?>
 		    <h6 class="event-label">Thank-you Message:</h6> <p class='a21-system-message'>for testing</p>
-		    <?php if( !empty($event->thank_you) ) echo $event->thank_you;?>
+		    <?php if( !empty($event->thank_you) ) echo stripslashes($event->thank_you);?>
 				
 			<h6 class="event-label">Event Tasks & Shifts:</h6><p class='a21-system-message'>Test mode, still under development</p>
 <!-- 
@@ -2490,6 +2504,93 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 				<small><?php _e( '(Note: Location must be an address)', 'groupcalendar' ); ?></small>
 			</label>
 
+			<label for="total-volunteers"><?php _e( 'Total Event Volunteers Needed', 'groupcalendar' ); ?></label>
+			<input name="total-volunteers" id="total-volunteers" value="<?php echo $event->total_vols;?>" type="text">
+
+			<?php
+			/* **** as21  for EDIT EVENT **** */
+
+			$event_tasks = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id='{$event_id}'");
+			$event_times = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_time WHERE event_id='{$event_id}'");
+
+			/* **** as21 parse ids_vols & count vols**** */
+
+			// echo "as21 parse ids_vols & count vols<hr>";
+
+			alex_debug(0,1,"orig arr tasks",$event_tasks);
+			alex_debug(0,1,"",$event_times);
+
+			foreach ($event_tasks as $k => $task ) {
+				$cnt_vols = explode(",",$task->cnt_vols);
+				$event_tasks[$k]->cnt_vols = $cnt_vols;
+
+				// $ids_vols = explode(":",$task->ids_vols);
+				// $event_tasks[$k]->ids_vols = $ids_vols;
+				// echo "==== inside loop as21 parse ids_vols & count vols ====<br>";
+				// print_r($task);
+
+				if( !empty($task->ids_vols) ) {
+
+					$ids_vols = explode(":",$task->ids_vols);
+					$event_tasks[$k]->ids_vols = $ids_vols;
+					// print_r($cnt_vols);
+					// alex_debug(0,1,"ids_vols=",$ids_vols);
+					foreach ($ids_vols as $k2 => $v) {
+						// if(!$v) break;  // comment today (когда 1 ряд и много колонок ids_vols не парсятся)
+						// echo "v==".$v;
+						$ids_arr = explode(",",$v);
+						$event_tasks[$k]->ids_vols[$k2] = $ids_arr;
+						// print_r($event_tasks[$k]->cnt_vols);
+						// $event_tasks[$k]->ids_cnt[$k2] = $ids_arr;
+						// $event_tasks[$k]->ids_cnt[$k2]['cnt'] = $event_tasks[$k]->cnt_vols[$k2];
+						// $event_tasks[$k]->ids_cnt[$k2]['cnt'] = $event_tasks[$k]->cnt_vols[$k2];
+						// echo "<br>";
+						// echo "====k2-".$k2." v-".$v."<br>";
+					}
+
+				}else { unset($task->ids_vols);}
+
+			}
+			alex_debug(0,1,"arr tasks after parse",$event_tasks);
+
+			/* **** as21 parse ids_vols & count vols**** */
+
+			?>
+			<table id="a21_bgc_tasks_shifts" data-event-id="<?php echo $event_id;?>" style="margin-bottom: 5px;">
+
+				<tr class="title_columns">
+					<th class="a21_dinam_th_coll"> Task item </th>
+					<?php foreach ($event_times as $k => $v):?>
+						<th class="a21_dinam_th_coll"> 
+							 <input type="text" name="new_event_tasks[time][<?php echo $k;?>]" value="<?php echo $v->time;?>"/>
+						 </th>
+					<?php endforeach;?>
+				</tr>
+
+				<?php foreach ($event_tasks as $k => $task):?>
+
+					<tr class="a21_dinam_row" data-task_id="<?php echo $task->id;?>">
+						<td class="a21_dinam_coll"> 								
+						 <input type="text" name="new_event_tasks[<?php echo $k;?>][task]" value="<?php echo $task->task_title;?>"/>
+					   </td>
+
+						<?php foreach ($task->cnt_vols as $k2 => $cnt):?>
+							<?php
+							?>
+							<td class="a21_dinam_coll">
+								<input type="text" name="new_event_tasks[<?php echo $k;?>][<?php echo $k2;?>]" value="<?php echo $cnt;?>" /></td>
+						<?php endforeach;?>
+					</tr>
+				<?php endforeach;?>
+			</table>
+
+			<?php /* **** as21  for EDIT EVENT **** */ ?>
+
+
+			<label for="thank_you"><?php _e( 'Event Completion Thank-you Message', 'groupcalendar' ); ?></label>
+			<!-- <input name="thank_you" id="thank_you" value="" type="text"> -->
+			<textarea name="thank_you" id="thank_you" cols="30" rows="10"><?php echo stripslashes($event->thank_you);?></textarea>
+			
 			<p class="a21-system-box">Additional custom fields is still under development. Coming soon. Now you can only add or edit the image</p>
 
 			<?php if ( $event_id ) : ?>
