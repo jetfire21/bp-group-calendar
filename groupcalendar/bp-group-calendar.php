@@ -91,6 +91,48 @@ function as21_groups_action_join_group() {
 
 }
 
+
+function as21_bp_group_calendar_event_add_action_message( $user_id, $event_id, $task_title, $signup_time ) {
+
+	global $wpdb;
+	$event_id = (int)$event_id;
+	$event = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_calendars WHERE id = %d", $event_id ) );
+
+	// echo "====as21_bp_group_calendar_event_add_action_message==\r\n";
+	// echo $user_id."\r\n ";
+	// echo $event_id."\r\n ";
+	// echo $event_date."\r\n ";
+	// echo $event_title."\r\n ";
+	// echo $event->group_id."\r\n ";
+
+	$url = bp_group_calendar_create_event_url( $event_id );
+	$date = bgc_date_display( $event->event_time );
+	$group = groups_get_group( array( 'group_id' => $event->group_id) );
+	
+	// echo $url."\r\n ";
+	// echo $date."\r\n ";
+	// echo $group->name."\r\n ";
+
+	/* Record this in group activity stream */
+	$action  = sprintf( __( '%s Signed up to event task %s:', 'groupcalendar' ), bp_core_get_userlink( $user_id ), '<a href="' . bp_get_group_permalink( $event->group_id ) .$group->slug. '">' . esc_attr( $group->name ) . '</a>' );
+	$content = '<a href="' . $url . '" title="' . __( 'View Event', 'groupcalendar' ) . '">' . $date . ': ' . stripslashes( $event->event_title ) . '</a> Task: '.$task_title.' Time: '.$signup_time;
+
+	// echo $action."\r\n ";
+	// echo $content."\r\n ";
+
+	$activity_id = bp_activity_add( array(
+		'action'            => $action,
+		'content'           => $content,
+		'primary_link'      => $url,
+		'type'              => 'joined_cal_event_task',
+		'item_id'           => $event->group_id,
+		'component' => 'groups',
+		'secondary_item_id' => $event_id
+	) );
+	// var_dump($activity_id);
+	// exit;
+}
+
 /* **** as21  my functions **** */
 
 
@@ -240,6 +282,10 @@ function a21_bgc_add_new_volunteer(){
 	// exit;
 	global $wpdb;
 	$event_task = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE id = %d", $_POST['task_id'] ) );
+    $times = $wpdb->get_col( "SELECT `time` FROM {$wpdb->prefix}bp_groups_bgc_time WHERE event_id='".$_POST['event_id']."'");
+    $signup_time = $times[$i];
+	// print_r($times);
+	// exit;
 	// print_r($event_task);
 	// var_dump($event_task->ids_vols);
 
@@ -283,7 +329,9 @@ function a21_bgc_add_new_volunteer(){
 
 		// join current user to cur group
 		as21_groups_action_join_group();
+
 ////////////////// upgrade
+		// counter current actyally count voluteers
 		$event_task = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE id = %d", $_POST['task_id'] ) );
 		// alex_debug(0,1,"",$event_task);
 		$ids_vols = $event_task->ids_vols;
@@ -343,6 +391,9 @@ function a21_bgc_add_new_volunteer(){
 			    $debug .= as21_get_user_link_and_avatar($ids_vols[$i], false);
 			}
 		}
+
+		as21_bp_group_calendar_event_add_action_message( $_POST['user_id'], $_POST['event_id'], $event_task->task_title, $signup_time );
+
 		// $debug .= as21_get_user_link_and_avatar($user_id, false);
 		 $debug .= "<p class='a21-system-message'>new markup from ajax after click signup</p>";
 		 $js['html'] = $debug;
