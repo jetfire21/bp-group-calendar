@@ -47,6 +47,54 @@ add_action( 'widgets_init', create_function( '', 'return register_widget("BP_Gro
 //------------------------------------------------------------------------//
 
 /* **** as21 NEED FUTURE **** */
+/* **** as21  my functions **** */
+
+function as21_groups_action_join_group() {
+
+	// echo "==as21_groups_action_join_group==";
+	if ( !bp_is_groups_component() ) return false;
+
+	// // Nonce check.
+	// if ( !check_admin_referer( 'groups_join_group' ) )
+	// 	return false;
+
+	$bp = buddypress();
+
+	// checking values
+	// echo "<br> bp_loggedin_user_id=".bp_loggedin_user_id();
+	// echo "<br> bp->groups->current_group->id=".$bp->groups->current_group->id;
+	// var_dump( groups_is_user_member( bp_loggedin_user_id(), $bp->groups->current_group->id ) );
+	// var_dump(groups_is_user_banned( bp_loggedin_user_id(), $bp->groups->current_group->id) );
+	// var_dump( groups_join_group( $bp->groups->current_group->id ) );
+
+	// Skip if banned or already a member.
+	if ( !groups_is_user_member( bp_loggedin_user_id(), $bp->groups->current_group->id ) && !groups_is_user_banned( bp_loggedin_user_id(), $bp->groups->current_group->id ) ) {
+
+		/*// User wants to join a group that is not public.
+		if ( $bp->groups->current_group->status != 'public' ) {
+			if ( !groups_check_user_has_invite( bp_loggedin_user_id(), $bp->groups->current_group->id ) ) {
+				bp_core_add_message( __( 'There was an error joining the group.', 'buddypress' ), 'error' );
+				bp_core_redirect( bp_get_group_permalink( $bp->groups->current_group ) );
+			}
+		}
+		*/
+
+		/*// User wants to join any group.
+		if ( !groups_join_group( $bp->groups->current_group->id ) )
+			bp_core_add_message( __( 'There was an error joining the group.', 'buddypress' ), 'error' );
+		else
+			bp_core_add_message( __( 'You joined the group!', 'buddypress' ) );
+		*/
+		// bp_core_redirect( bp_get_group_permalink( $bp->groups->current_group ) );
+		groups_join_group( $bp->groups->current_group->id );
+	}
+
+}
+
+/* **** as21  my functions **** */
+
+
+
 add_action("a21_bgc_message_thankyou","a21_bgc_message_thankyou");
 
 function a21_bgc_message_thankyou(){
@@ -233,6 +281,8 @@ function a21_bgc_add_new_volunteer(){
 			array( '%d' )
 		);
 
+		// join current user to cur group
+		as21_groups_action_join_group();
 ////////////////// upgrade
 		$event_task = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE id = %d", $_POST['task_id'] ) );
 		// alex_debug(0,1,"",$event_task);
@@ -312,6 +362,10 @@ function a21_bgc_add_new_volunteer(){
 
 	exit;
 }
+
+
+
+
 /* **** as21 **** */
 
 
@@ -1952,7 +2006,8 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 				 		        		 // echo "<br>";
 		        		 	
 					        		 	// hide if cur_user sign up to event task in cur time
-					   				 	if($cur_user->ID == $vol_id) {
+					   				 	if( !empty($cur_user->ID) && $cur_user->ID == $vol_id) {
+					   				 		// echo "---".$cur_user->ID; echo $vol_id;
 					   				 		$vol_hide_btn = true; 
 					   				 		$show_cancel_my_attandance = $cancel_my_attandance_html;					   				 	
 					   				 	}
