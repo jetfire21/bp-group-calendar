@@ -518,7 +518,7 @@ if ( class_exists( 'BP_Group_Extension' ) ) {
 		function bp_group_calendar_extension() {
 			global $bp;
 
-			$this->name            = __( 'Calendar', 'groupcalendar' );
+			$this->name            = __( 'Huddle', 'groupcalendar' );
 			$this->slug            = 'huddle';
 			$this->enable_nav_item = isset( $bp->groups->current_group->user_has_access ) ? $bp->groups->current_group->user_has_access : false;
 
@@ -1666,7 +1666,7 @@ function bp_group_calendar_widget_day( $date ) {
 					<?php print( $cal->output_calendar() ); ?>
 				</td>
 				<td class="cal-right">
-					<h5 class="events-title"><?php _e( "Events For", 'groupcalendar' ); ?> <?php echo date_i18n( get_option( 'date_format' ), strtotime( $day ) ); ?>
+					<h5 class="events-title"><?php _e( "Huddle Events For", 'groupcalendar' ); ?> <?php echo date_i18n( get_option( 'date_format' ), strtotime( $day ) ); ?>
 						:</h5>
 					<?php bp_group_calendar_list_events( $bp->groups->current_group->id, 'day', $day, $calendar_capabilities ); ?>
 				</td>
@@ -2518,8 +2518,8 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 
 			// echo "as21 parse ids_vols & count vols<hr>";
 
-			alex_debug(0,1,"orig arr tasks",$event_tasks);
-			alex_debug(0,1,"",$event_times);
+			// alex_debug(0,1,"orig arr tasks",$event_tasks);
+			// alex_debug(0,1,"",$event_times);
 
 			foreach ($event_tasks as $k => $task ) {
 				$cnt_vols = explode(",",$task->cnt_vols);
@@ -2552,7 +2552,7 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 				}else { unset($task->ids_vols);}
 
 			}
-			alex_debug(0,1,"arr tasks after parse",$event_tasks);
+			// alex_debug(0,1,"arr tasks after parse",$event_tasks);
 
 			/* **** as21 parse ids_vols & count vols**** */
 
