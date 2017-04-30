@@ -1963,6 +1963,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 	$event_created_by    = bp_core_get_userlink( $event->user_id );
 	$event_created       = bgc_date_display( $event->created_stamp, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) );
+	$event_time       = bgc_date_display( $event->event_time, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) );
 	$event_modified_by   = bp_core_get_userlink( $event->last_edited_id );
 	$event_last_modified = bgc_date_display( $event->last_edited_stamp, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) );
 
@@ -1976,6 +1977,8 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		</h4>
 		<div class="bgc-event-details-left">
 			<h5 class="events-title"><?php echo stripslashes( $event->event_title ); ?></h5>
+			<h6 class="event-label"><?php _e( 'Data/Time:', 'groupcalendar' ); ?></h6>
+			<?php echo $event_time; ?>
 			<span
 				class="activity"><?php echo bgc_date_display( $event->event_time, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) ); ?></span>
 
@@ -2076,7 +2079,8 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 		    <h6 class="event-label">Total Event Volunteers Needed:</h6> 
 		    <?php if( !empty($event->total_vols) ) echo $event->total_vols;?>
-		    <h6 class="event-label">Thank-you Message:</h6> <p class='a21-system-message'>for testing</p>
+		    <h6 class="event-label">Thank-you Message:</h6> 
+		    <!-- <p class='a21-system-message'>for testing</p> -->
 		    <?php if( !empty($event->thank_you) ) echo stripslashes($event->thank_you);?>
 				
 			<h6 class="event-label">Event Tasks & Shifts:</h6><p class='a21-system-message'>Test mode, still under development</p>
