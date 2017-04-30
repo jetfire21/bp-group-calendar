@@ -166,11 +166,12 @@ function a21_bgc_message_thankyou(){
 function as21_get_user_link_and_avatar($user_id, $iter = false){
 
 	// $debug .= "<br>function as21_get_user_link_and_avatar<br>";
-  	if( ($iter && $iter == 1) or !$iter) $debug .= "Attendees: ";
+  	if( ($iter && $iter == 1) or !$iter) $debug .= "<p class='attendees'>Attendees: ";
   	// $member_name .= "<p class='a21-system-message'>id ".$user_id."-".bp_core_get_username($user_id)."</p>";
 	$member_link = bp_core_get_userlink($user_id,false,true);	
 	$member_avatar = bp_core_fetch_avatar( array('item_id'=>$user_id, 'width'=>"30",'html'=>true));
 	$debug .= "<a class='link-user-id-".$user_id."' href='".$member_link."' >".$member_avatar."</a>";
+	// $debug .= "</p>";
 	return $debug;
 }
 
@@ -280,8 +281,8 @@ function a21_cancel_my_attandance(){
 
 		$still_need_count = $cnt_primary_vols - $cnt_vols_signup_now;
 		$js['cnt_vols_signup_now'] = $cnt_vols_signup_now;
-
-		$debug .= '<p><span class="vol_cnt">'.$still_need_count.'</span> Needed</p><button class="a21_add_new_volunteer" data-s-need-cnt="'.$still_need_count.'" data-i="'.$i.'" data-id="'.$user_id.'" data-nick="test">i want to attend</button>';
+		$need = "Needed";
+		$debug .= '<p class="still_need"><span class="vol_cnt">'.$still_need_count.'</span> '.$need.'</p><button class="a21_add_new_volunteer" data-s-need-cnt="'.$still_need_count.'" data-i="'.$i.'" data-id="'.$user_id.'" data-nick="test">i want to attend</button>';
 		// echo $debug;
 		// exit;
 		// echo "ids_vols[i]= "; var_dump($ids_vols[$i]);
@@ -484,7 +485,7 @@ function a21_bgc_add_new_volunteer(){
 		// $debug .= '<button class="a21_add_new_volunteer" data-s-need-cnt="'.$still_need_count.'" data-i="'.$i.'" data-id="'.$user_id.'" data-nick="test">signup</button><p><span class="vol_cnt">'.$still_need_count.'</span> Needed</p>';
 
 		if($cnt_primary_vols == $cnt_vols_signup_now ) { $js['full'] = true; /* $debug .= "<p>Full</p>"; */}
-		else $debug .= "<p><span class='vol_cnt'>".$still_need_count."</span> Needed</p>";
+		else $debug .= "<p class='still_need'><span class='vol_cnt'>".$still_need_count."</span> Needed</p>";
 
 		$debug .= "<button class='a21_cancel_my_attandance' data-s-need-cnt='".$still_need_count."'' data-i='".$i."' data-task-id='".$task_id."' data-user-id='".$user_id."'>cancel my attandance</button>";
 
@@ -2144,7 +2145,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		 // echo " cnt ".$cnt." == task->ids_vols[k2] $k2, ".count($task->ids_vols[$k2]);
 		        		 // echo "<br>";
 
- 		        		 if( $still_need_count != 0 ) { echo "<span class='vol_cnt'>".$still_need_count."</span> "; echo $need."<br>"; }
+ 		        		 if( $still_need_count != 0 ) { echo "<p class='still_need'><span class='vol_cnt'>".$still_need_count."</span> "; echo $need."</p>"; }
 
 
 						/* **** hide/show btn signup **** */
@@ -2237,11 +2238,12 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		  $i = 1;
 		        		  foreach ($arr_vols_cur_task as $member_id) {
 	  	        		      if(!empty($member_id) ) {
-	  	        		      	if($i == 1) echo "Attendees: ";
+	  	        		      	if($i == 1) echo "<p class='attendees'>Attendees: ";
 	  	        		      	$member_name .= "<p class='a21-system-message'>id ".$member_id."-".bp_core_get_username($member_id)."</p>";
 								$member_link = bp_core_get_userlink($member_id,false,true);	
 								$member_avatar = bp_core_fetch_avatar( array('item_id'=>$member_id, 'width'=>"30",'html'=>true));
 								echo "<a class='link-user-id-".$member_id."' href='".$member_link."' >".$member_avatar."</a>";
+								if($i == count($arr_vols_cur_task)) echo "</p>";
 								$i++;  	        		     
 							 }
 		        		  }
