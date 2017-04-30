@@ -191,6 +191,7 @@ table.calendar-view {margin:0;}
 #a21_bgc_tasks_shifts .red-cell { background-color: #d48668 !important; color: #000;}
 #a21_bgc_tasks_shifts .red-cell .a21-system-message { color: #fff;}
 #a21_bgc_tasks_shifts .yellow-cell { background-color: #ede5ad !important; color: #000;}
+.a21_dinam_coll button{ margin:0 auto 10px auto; }
 
 .bgc-event-details-left{ float:left; width:60%; }
 .bgc-event-image { max-width: 39% !important; }

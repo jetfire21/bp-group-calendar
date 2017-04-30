@@ -167,7 +167,7 @@ function as21_get_user_link_and_avatar($user_id, $iter = false){
 
 	// $debug .= "<br>function as21_get_user_link_and_avatar<br>";
   	if( ($iter && $iter == 1) or !$iter) $debug .= "Attendees: ";
-  	$member_name .= "<p class='a21-system-message'>id ".$user_id."-".bp_core_get_username($user_id)."</p>";
+  	// $member_name .= "<p class='a21-system-message'>id ".$user_id."-".bp_core_get_username($user_id)."</p>";
 	$member_link = bp_core_get_userlink($user_id,false,true);	
 	$member_avatar = bp_core_fetch_avatar( array('item_id'=>$user_id, 'width'=>"30",'html'=>true));
 	$debug .= "<a class='link-user-id-".$user_id."' href='".$member_link."' >".$member_avatar."</a>";
@@ -254,12 +254,15 @@ function a21_cancel_my_attandance(){
 			// echo "ids_vols[i]="; var_dump($str_del_vol[$i]); 	echo "\r\n";
 	    }
 
-
+	    /* important for debug
 		$debug = "<p class='a21-system-message'>cnt_primary_vols=".$cnt_primary_vols."</p>";
+		*/
+
 		// var_dump($ids_vols);
 		// echo "arr vols cur task & cur time column =";
 		// echo "ids_vols[i]="; $ids_vols[$i]; 	echo "\r\n";
 		// exit;
+
 		// if many vols then it array, if one vol then it string
 		// if( preg_match("#,#i", $ids_vols[$i]) ) {
 		if( preg_match("#,#i", $str_del_vol[$i]) ) {
@@ -270,11 +273,15 @@ function a21_cancel_my_attandance(){
 			else $cnt_vols_signup_now = 0;
 		}
 		// $js['cnt_vols_signup_now'] = $cnt_vols_signup_now;
+		
+		/* important for debug
 		$debug .= "<p class='a21-system-message'>cnt_vols_signup_now =".$cnt_vols_signup_now."</p>";
+		*/
+
 		$still_need_count = $cnt_primary_vols - $cnt_vols_signup_now;
 		$js['cnt_vols_signup_now'] = $cnt_vols_signup_now;
 
-		$debug .= '<button class="a21_add_new_volunteer" data-s-need-cnt="'.$still_need_count.'" data-i="'.$i.'" data-id="'.$user_id.'" data-nick="test">i want to attend</button><p><span class="vol_cnt">'.$still_need_count.'</span> Needed</p>';
+		$debug .= '<p><span class="vol_cnt">'.$still_need_count.'</span> Needed</p><button class="a21_add_new_volunteer" data-s-need-cnt="'.$still_need_count.'" data-i="'.$i.'" data-id="'.$user_id.'" data-nick="test">i want to attend</button>';
 		// echo $debug;
 		// exit;
 		// echo "ids_vols[i]= "; var_dump($ids_vols[$i]);
@@ -314,7 +321,7 @@ function a21_cancel_my_attandance(){
 		// exit;
 		// if($query) return true;
 
-		 $debug .= "<p class='a21-system-message'>new markup from ajax</p>";
+		 // $debug .= "<p class='a21-system-message'>new markup from ajax</p>";
 		 $js['html'] = $debug;
 		 echo json_encode($js);
 	}
@@ -444,7 +451,9 @@ function a21_bgc_add_new_volunteer(){
 	    	// echo "=== str_ids_vols=".$str_ids_vols; echo "\r\n";
 	    }else $str_ids_vols = $ids_vols[$i];
 
+		/* important for debug
 		$debug .= "<p class='a21-system-message'>cnt_primary_vols=".$cnt_primary_vols."</p>";
+		*/
 
 		// if many vols then it array, if one vol then it string
 		if( preg_match("#,#i", $str_ids_vols) ) {
@@ -466,12 +475,20 @@ function a21_bgc_add_new_volunteer(){
 		// var_dump($ids_vols[$i]);
 		// exit;
 		// $js['cnt_vols_signup_now'] = $cnt_vols_signup_now;
+
+		/* important for debug
 		$debug .= "<p class='a21-system-message'>cnt_vols_signup_now =".$cnt_vols_signup_now."</p>";
+		*/
+
 		$still_need_count = $cnt_primary_vols - $cnt_vols_signup_now;
 		// $debug .= '<button class="a21_add_new_volunteer" data-s-need-cnt="'.$still_need_count.'" data-i="'.$i.'" data-id="'.$user_id.'" data-nick="test">signup</button><p><span class="vol_cnt">'.$still_need_count.'</span> Needed</p>';
-		$debug .= "<button class='a21_cancel_my_attandance' data-s-need-cnt='".$still_need_count."'' data-i='".$i."' data-task-id='".$task_id."' data-user-id='".$user_id."'>cancel my attandance</button>";
-		if($cnt_primary_vols == $cnt_vols_signup_now ) { $js['full'] = true; $debug .= "<p>Full</p>"; }
+
+		if($cnt_primary_vols == $cnt_vols_signup_now ) { $js['full'] = true; /* $debug .= "<p>Full</p>"; */}
 		else $debug .= "<p><span class='vol_cnt'>".$still_need_count."</span> Needed</p>";
+
+		$debug .= "<button class='a21_cancel_my_attandance' data-s-need-cnt='".$still_need_count."'' data-i='".$i."' data-task-id='".$task_id."' data-user-id='".$user_id."'>cancel my attandance</button>";
+
+
 		// echo "ids_vols[i]= "; var_dump($ids_vols[$i]);
 	  	// $member_name = '';
 		 // echo "preg_match , " ; var_dump( preg_match("#,#i", $ids_vols[$i]) );
@@ -496,7 +513,9 @@ function a21_bgc_add_new_volunteer(){
 
 		as21_bp_group_calendar_event_add_action_message( $_POST['user_id'], $_POST['event_id'], $event_task->task_title, $signup_time );
 		// $debug .= as21_get_user_link_and_avatar($user_id, false);
-		 $debug .= "<p class='a21-system-message'>new markup from ajax after click signup</p>";
+
+		 // $debug .= "<p class='a21-system-message'>new markup from ajax after click signup</p>";
+
 		 // echo $debug;
 		 $js['html'] = $debug;
 		 echo json_encode($js);
@@ -2125,6 +2144,9 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		 // echo " cnt ".$cnt." == task->ids_vols[k2] $k2, ".count($task->ids_vols[$k2]);
 		        		 // echo "<br>";
 
+ 		        		 if( $still_need_count != 0 ) { echo "<span class='vol_cnt'>".$still_need_count."</span> "; echo $need."<br>"; }
+
+
 						/* **** hide/show btn signup **** */
 
 						 $vol_hide_btn = false;
@@ -2192,11 +2214,15 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 		        		  <?php 
 		        		  // alex_debug(0,1,"array vols cur task",$arr_vols_cur_task);
+
+/* important for debug
 		        		  echo "<p class='a21-system-message'>current count vols=".$cur_count."</p>";
 		        		  if($cur_count >= $cnt) echo "<p class='a21-system-message'>full</p>";
 		        		  echo "<p class='a21-system-message'>total for cur task & time=".$cnt."</p>";
+*/
 		        		  // echo "<br>";
-		        		  if( $still_need_count != 0 ) { echo "<span class='vol_cnt'>".$still_need_count."</span> "; echo $need."<br>"; }
+
+
 		        		  // alex_debug(0,1,"event_tasks[k]->ids_vols",$event_tasks[$k]->ids_vols);
 		        		  // echo "event_tasks[k]->ids_vols[k2]=".$arr_vols_cur_task;
 		        		  // echo "<br>";
@@ -2204,7 +2230,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		  // echo "<br>";
 
 		        		  // if only one volunteer..e.g. 1:: or :5:
-		        		  if( !is_array($arr_vols_cur_task) && !empty($arr_vols_cur_task) ) echo "id + ".$member_id."-".$member_name = bp_core_get_username($arr_vols_cur_task)."<br>";
+		        		  // if( !is_array($arr_vols_cur_task) && !empty($arr_vols_cur_task) ) echo "id + ".$member_id."-".$member_name = bp_core_get_username($arr_vols_cur_task)."<br>";
 
 		        		  if( !empty($show_cancel_my_attandance) ) echo $show_cancel_my_attandance;
 		        		  $member_name = '';
@@ -2219,7 +2245,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 								$i++;  	        		     
 							 }
 		        		  }
-		        		  echo $member_name;
+		        		  // echo $member_name;
 		        		  ?> 
 		        		 </td>
 		      		 <?php endforeach;?>
@@ -2260,7 +2286,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		// alex_debug(0,1,"",$event_tasks);
 		 /**** a21 ******/ 
 		?>
-		
+
 		<?php if ( $event->event_location ) : ?>
 			<h6 class="event-label"><?php _e( 'Location:', 'groupcalendar' ); ?></h6>
 			<div class="event-location">
