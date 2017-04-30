@@ -168,4 +168,37 @@ table.calendar td.pad:hover {
     font-size: 110%
 }
 
+/* modification */
 
+
+
+/* ******* PAGE CALENDAR ********* */
+
+#a21_bgc_tasks_shifts tr input{
+    border: 0;
+    margin: 0;
+    width: 100% !important;
+}
+#a21_bgc_tasks_shifts button{ display: block; }
+#a21_bgc_tasks_shifts .avatar { margin-right: 5px; }
+#a21_bgc_add_new_row, #a21_bgc_add_new_column{display: table;}
+#add-event-form #total-volunteers{ width: 70px;  }
+#a21_bgc_del_row, #a21_bgc_del_column{ display: none; }
+.wrap_btns_for_event_tasks {overflow: hidden; clear: both;}
+.wrap_btns_for_event_tasks .d_btn_left {float: left;}
+.wrap_btns_for_event_tasks .d_btn_right{float: right;}
+table.calendar-view {margin:0;}
+#a21_bgc_tasks_shifts .red-cell { background-color: #d48668 !important; color: #000;}
+#a21_bgc_tasks_shifts .red-cell .a21-system-message { color: #fff;}
+#a21_bgc_tasks_shifts .yellow-cell { background-color: #ede5ad !important; color: #000;}
+
+.bgc-event-details-left{ float:left; width:60%; }
+.bgc-event-image { max-width: 39% !important; }
+
+/* ******* PAGE CALENDAR ********* */
+
+@media only screen and (max-width: 992px){
+    .bp-user #content .main{ float: none; width: 100% !important; }
+    .bgc-event-details-left{ float:none; width:100%; }
+    .bgc-event-image { max-width: 60% !important; }
+}

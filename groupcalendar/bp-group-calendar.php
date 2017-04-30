@@ -1954,34 +1954,18 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 			<?php _e( 'Event Details', 'groupcalendar' ); ?>
 			<?php echo $edit_link; ?>
 		</h4>
+		<div class="bgc-event-details-left">
+			<h5 class="events-title"><?php echo stripslashes( $event->event_title ); ?></h5>
+			<span
+				class="activity"><?php echo bgc_date_display( $event->event_time, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) ); ?></span>
 
-		<h5 class="events-title"><?php echo stripslashes( $event->event_title ); ?></h5>
-		<span
-			class="activity"><?php echo bgc_date_display( $event->event_time, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) ); ?></span>
-
-		<?php if ( $event->event_description ) : ?>
-			<h6 class="event-label"><?php _e( 'Description:', 'groupcalendar' ); ?></h6>
-			<div class="event-description">
-				<?php echo stripslashes( $event->event_description ); ?>
-			</div>
-		<?php endif; ?>
-
-		<?php if ( $event->event_location ) : ?>
-			<h6 class="event-label"><?php _e( 'Location:', 'groupcalendar' ); ?></h6>
-			<div class="event-location">
-
-				<?php echo stripslashes( $event->event_location ); ?>
-
-				<?php if ( $event->event_map ) : ?>
-					<span class="event-map">
-    	    <a href="<?php echo $map_url; ?>" target="_blank"
-	           title="<?php _e( 'View Google Map of Event Location', 'groupcalendar' ); ?>"><?php _e( 'Map', 'groupcalendar' ); ?> &raquo;</a>
-    	  </span>
-				<?php endif; ?>
-			</div>
-		<?php endif; ?>
-		
-			<p class="a21-system-box">Additional custom fields is still under development. Coming soon. Now you can only add or edit the image</p>
+			<?php if ( $event->event_description ) : ?>
+				<h6 class="event-label"><?php _e( 'Description:', 'groupcalendar' ); ?></h6>
+				<div class="event-description">
+					<?php echo stripslashes( $event->event_description ); ?>
+				</div>
+			<?php endif; ?>
+		</div>
 
 		<?php
 		/**** a21_display******/
@@ -2007,8 +1991,12 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 	    //  $wpdb->query($sql);
 
 
-		if($event_image) {?> <img src="<?php echo $event_image;?>" alt=""><?php }
+		if($event_image) {?> <img class="bgc-event-image" src="<?php echo $event_image;?>" alt=""><?php }
 
+?>
+		<div class="clearfix"></div>
+
+<?php
 
 		/* **** as21 parse ids_vols & count vols**** */
 
@@ -2272,6 +2260,24 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		// alex_debug(0,1,"",$event_tasks);
 		 /**** a21 ******/ 
 		?>
+		
+		<?php if ( $event->event_location ) : ?>
+			<h6 class="event-label"><?php _e( 'Location:', 'groupcalendar' ); ?></h6>
+			<div class="event-location">
+
+				<?php echo stripslashes( $event->event_location ); ?>
+
+				<?php if ( $event->event_map ) : ?>
+					<span class="event-map">
+    	    <a href="<?php echo $map_url; ?>" target="_blank"
+	           title="<?php _e( 'View Google Map of Event Location', 'groupcalendar' ); ?>"><?php _e( 'Map', 'groupcalendar' ); ?> &raquo;</a>
+    	  </span>
+				<?php endif; ?>
+			</div>
+		<?php endif; ?>
+		
+		<p class="a21-system-box">Additional custom fields is still under development. Coming soon. Now you can only add or edit the image</p>
+
 
 		<?php echo $event_meta; ?>
 
