@@ -232,7 +232,7 @@ function a21_cancel_my_attandance(){
 		// alex_debug(0,1,"event_task",$event_task);
 
 		if( strpos($ids_vols, ":") !== false ){
-			
+
 			$cnt_vols = explode(",",$event_task->cnt_vols);
 			$cnt_primary_vols = $cnt_vols[$i];
 			$ids_vols = explode(":",$ids_vols);
@@ -330,12 +330,12 @@ function a21_bgc_add_new_volunteer(){
 	$i = (int)$_POST['i'];
 	$num_cur_column = $i;
 
-	echo "\r\n ===wp ajax success! get POST === \r\n";
+	// echo "\r\n ===wp ajax success! get POST === \r\n";
 	// echo "<br>user_id ".$_POST['user_id'];
 	// echo "<br>task_id ".$_POST['task_id'];
 	// $debug .= "<br>event_id ".$_POST['event_id'];
 	// $debug .= "<br>i ".$num_cur_column;
-	// $debug .= "<br>";
+	// $debug .= "<br>\r\n"; var_dump($i);
 	// exit;
 
 	global $wpdb;
@@ -346,19 +346,19 @@ function a21_bgc_add_new_volunteer(){
     $column_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}bp_groups_bgc_time WHERE event_id='".$_POST['event_id']."'");
 	// print_r($times);
 	// exit;
-	print_r($event_task);
+	// print_r($event_task);
 	// var_dump($event_task->ids_vols);
 
 	if(empty($event_task->ids_vols)) {
 		// if ids_vols is empty,then insert current memeber_id 
-		$debug .= "\r\n ids_vols-empty";
-	    $debug .= "\r\n column_count=".$column_count;
+		// $debug .= "\r\n ids_vols-empty";
+	    // $debug .= "\r\n column_count=".$column_count;
 
 	    if( $column_count > 1 ){
-		    for($i=0; $i<$column_count; $i++){
+		    for($qq=0; $qq<$column_count; $qq++){
 		    	// format record ids_vols 2,3:3,4,2:2,1,2 	// ::1 or 1:: or :1:
-		    	if($i==$num_cur_column) { $val .= $_POST['user_id'];}
-		    	else { $val .= ""; if($i < $column_count) $val .= ":";}
+		    	if($qq==$num_cur_column) { $val .= $_POST['user_id'];}
+		    	else { $val .= ""; if($qq < $column_count) $val .= ":";}
 		    	// if($i==$num_cur_column) { $val .= $_POST['user_id']; if($i == 0) $val .= ":";}
 		    	// else { $val .= ""; if($i < $column_count) $val .= "0:";}
 		    }
@@ -374,11 +374,13 @@ function a21_bgc_add_new_volunteer(){
 			array( '%s' ),
 			array( '%d' )
 		);
+		// echo "deb last query = "; deb_last_query();
+
 	}
 	else{
 	    // echo $debug .= "\r\n if !empty val ids_vols=".$val;
 	    if( strpos($event_task->ids_vols, ":") !== false ){
-	    	$debug .= "\r\n search char (:) ";
+	    	// $debug .= "\r\n search char (:) ";
 			$ids_vols = explode(":",$event_task->ids_vols);
 			// $debug .= "ids_vols is not empty!";
 			// $debug .= "arr vols cur task=".$ids_vols[$_POST['i']];
@@ -388,10 +390,11 @@ function a21_bgc_add_new_volunteer(){
 			 $ids_vols = implode(":", $ids_vols);
 			// exit;
 		}else{
-	    	$debug .= "\r\n if search char (:) not found ";
+	    	// $debug .= "\r\n if search char (:) not found ";
 		    // if( strpos($event_task->ids_vols, ",") === false )  $ids_vols = $_POST['user_id'];
 		    // else $ids_vols = $event_task->ids_vols.",".$_POST['user_id'];
 		    $ids_vols = $event_task->ids_vols.",".$user_id;
+		    // echo "ids vosl "; var_dump($ids_vols); echo "\r\n";
 		}
 
 		$wpdb->update( $wpdb->prefix."bp_groups_bgc_tasks",
@@ -400,15 +403,17 @@ function a21_bgc_add_new_volunteer(){
 			array( '%s' ),
 			array( '%d' )
 		);
-		echo $debug;
-		echo "\r\n =====deb_last_query==== \r\n";
-		deb_last_query();
-		exit;
+		// на этом шаге обновление происходит правильно!!!
+
+		// echo $debug;
+		// echo "\r\n =====deb_last_query==== \r\n";
+		// echo "deb last query = "; deb_last_query();
+		// exit;
 
 
 	}
 
-exit;
+// exit;
 
 
 ////////////////// upgrade
@@ -429,19 +434,24 @@ exit;
 			$cnt_primary_vols = $cnt_vols[$i];
 			$ids_vols = explode(":",$ids_vols);
 	    }
+	    // $debug .= "\r\n<br> qq cnt_primary_vols".$cnt_primary_vols. "\r\n";
+	    // $debug .= "\r\n<br> cnt vols"; var_dump($cnt_vols);echo "\r\n";
+	    // $debug .= "\r\n<br> i=".$i. "\r\n";
 
 	    if( strpos($event_task->ids_vols, ":") === false && !empty($event_task->ids_vols)){
 	    	$cnt_primary_vols = $event_task->cnt_vols;
-	    }
+	    	$str_ids_vols = $event_task->ids_vols;
+	    	// echo "=== str_ids_vols=".$str_ids_vols; echo "\r\n";
+	    }else $str_ids_vols = $ids_vols[$i];
 
 		$debug .= "<p class='a21-system-message'>cnt_primary_vols=".$cnt_primary_vols."</p>";
 
 		// if many vols then it array, if one vol then it string
-		if( preg_match("#,#i", $ids_vols[$i]) ) {
-			$cnt_vols_signup_now = explode(",", $ids_vols[$i] );
+		if( preg_match("#,#i", $str_ids_vols) ) {
+			$cnt_vols_signup_now = explode(",", $str_ids_vols );
 			$cnt_vols_signup_now = count($cnt_vols_signup_now);
 		}else { 
-			if( !empty($ids_vols[$i]) ) $cnt_vols_signup_now = 1;
+			if( !empty($str_ids_vols) ) $cnt_vols_signup_now = 1;
 			else $cnt_vols_signup_now = 0;
 		}
 
@@ -468,9 +478,9 @@ exit;
 		 // var_dump($ids_vols[$i]);
   		// if many vols then it array, if one vol then it string
 		// if( preg_match("#,#i", $ids_vols[$i]) ) {
-		if( strpos($ids_vols[$i],",") !== false ) {
+		if( strpos($str_ids_vols,",") !== false ) {
 			 $ii = 1;
-			  $arr_ids_vols = explode(",", $ids_vols[$i] );
+			  $arr_ids_vols = explode(",", $str_ids_vols );
 			  foreach ($arr_ids_vols as $member_id) {
 		        if(!empty($member_id) ) {
 					$debug .= as21_get_user_link_and_avatar($member_id, $ii);
@@ -479,7 +489,7 @@ exit;
 			  }
 		}else{
 			// if only one vol
-			if( !empty($ids_vols[$i]) ) {
+			if( !empty($str_ids_vols) ) {
 			    $debug .= as21_get_user_link_and_avatar($ids_vols[$i], false);
 			}
 		}
@@ -487,6 +497,7 @@ exit;
 		as21_bp_group_calendar_event_add_action_message( $_POST['user_id'], $_POST['event_id'], $event_task->task_title, $signup_time );
 		// $debug .= as21_get_user_link_and_avatar($user_id, false);
 		 $debug .= "<p class='a21-system-message'>new markup from ajax after click signup</p>";
+		 // echo $debug;
 		 $js['html'] = $debug;
 		 echo json_encode($js);
 ///////////////////
