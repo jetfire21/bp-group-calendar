@@ -561,7 +561,11 @@ function a21_bgc_add_new_volunteer(){
 		// echo "ids_vols[i]= "; var_dump($ids_vols[$i]);
 	  	// $member_name = '';
 		 // echo "preg_match , " ; var_dump( preg_match("#,#i", $ids_vols[$i]) );
-		 // var_dump($ids_vols[$i]);
+		// var_dump($str_ids_vols);
+		//  var_dump($ids_vols[$i]);
+		//  var_dump($ids_vols);
+		//  exit;
+
   		// if many vols then it array, if one vol then it string
 		// if( preg_match("#,#i", $ids_vols[$i]) ) {
 		if( strpos($str_ids_vols,",") !== false ) {
@@ -576,7 +580,7 @@ function a21_bgc_add_new_volunteer(){
 		}else{
 			// if only one vol
 			if( !empty($str_ids_vols) ) {
-			    $debug .= as21_get_user_link_and_avatar($ids_vols[$i], false);
+			    $debug .= as21_get_user_link_and_avatar($str_ids_vols, false);
 			}
 		}
 
