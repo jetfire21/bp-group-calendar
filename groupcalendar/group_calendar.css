@@ -45,13 +45,13 @@ table.calendar-view td.cal-right {
 h5.events-title {
     margin: 0px;
     margin-bottom: 5px;
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 2.175em;
 }
 
 h6.event-label {
-    margin-top: 10px;
-    margin-bottom: 5px;
-    font-style: italic;
+    margin-top: 15px;
+    margin-bottom: 2px;
 }
 
 div.event-description, div.event-location {
@@ -188,7 +188,7 @@ table.calendar td.pad:hover {
 .wrap_btns_for_event_tasks .d_btn_left {float: left;}
 .wrap_btns_for_event_tasks .d_btn_right{float: right;}
 table.calendar-view {margin:0;}
-#a21_bgc_tasks_shifts .red-cell { background-color: #d48668 !important; color: #000;}
+#a21_bgc_tasks_shifts .red-cell { background-color: #88b668 !important; color: #000;}
 #a21_bgc_tasks_shifts .red-cell .a21-system-message { color: #fff;}
 #a21_bgc_tasks_shifts .yellow-cell { background-color: #ede5ad !important; color: #000;}
 .a21_dinam_coll button{ margin:0 15px 10px 15px;float: left; }

@@ -785,7 +785,7 @@ function bp_group_calendar_event_save() {
 		
 		// alex_debug(1,1,"",$_REQUEST);
 		// alex_debug(1,1,"",$_FILES);
-		alex_debug(1,1,"",$_POST);
+		// alex_debug(1,1,"",$_POST);
 		// echo "===as21_save===";
 		// exit;
 
@@ -859,65 +859,6 @@ function bp_group_calendar_event_save() {
 
 		//editing previous event
 		if ( isset( $_POST['event-id'] ) ) {
-
-			if( !empty( $_POST['new_event_tasks']) && $_POST['new_event_tasks'] > 1){
-
-				// sanitizing input data
-				foreach ($_POST['new_event_tasks']['time'] as $k => $time) {
-					$esc_post['new_event_tasks']['time'][$k] = sanitize_text_field($time);
-				}
-
-				foreach ($_POST['new_event_tasks'] as $k => $item) {
-					// echo "k-".$k."<br>";
-					// print_r($item);
-					if($k !== "time") {
-						// echo "<br>item task= ".$item['task']."<br>";
-						$esc_post['new_event_tasks'][$k]['task'] = sanitize_text_field($item['task']);
-						foreach ($item as $k2 => $v) {
-							if($k2 !== "task") { $esc_post['new_event_tasks'][$k][$k2] = (int)$v;}
-						}
-					}
-				}
-			}
-
-			$times = $esc_post['new_event_tasks']['time'];
-			unset($esc_post['new_event_tasks']['time']);
-
-			foreach ($times as $k => $v) {
-				$wpdb->update( $wpdb->prefix."bp_groups_bgc_time",
-					array( 'time' => $v),
-					array( 'id' => $k ),
-					array( '%s'),
-					array( '%d' )
-				);
-			}
-
-			echo "after parsing";
-			alex_debug(0,1,"times",$times);
-			alex_debug(0,1,"new_event_tasks",$esc_post['new_event_tasks']);
-			foreach ($esc_post['new_event_tasks'] as $k => $item) {
-				// var_dump($item);
-				$str_cnt_vols = "";
-				foreach ($item as $k2 => $v) {
-					// echo $v. " ";
-					// echo $k2. " ";
-					if($k2 === "task") $title_task = $v;
-					else $str_cnt_vols .= $v.",";
-					// echo $k2." ";
-				}
-				$str_cnt_vols = substr($str_cnt_vols, 0,-1);
-				echo $title_task." id-".$k.": ".$str_cnt_vols."<br>";
-
-				$wpdb->update( $wpdb->prefix."bp_groups_bgc_tasks",
-					array( 'task_title' => $title_task, "cnt_vols"=> $str_cnt_vols),
-					array( 'id' => $k ),
-					array( '%s','%s' ),
-					array( '%d' )
-				);
-
-			}
-			// здесь остановился
-
 
 			//can user modify this event?
 			if ( $calendar_capabilities == 'limited' ) {
@@ -2030,13 +1971,13 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 	?>
 	<div class="bp-widget">
-		<h4>
+		<h5>
 			<?php _e( 'Event Details', 'groupcalendar' ); ?>
 			<?php echo $edit_link; ?>
-		</h4>
+		</h5>
 		<div class="bgc-event-details-left">
 			<h5 class="events-title"><?php echo stripslashes( $event->event_title ); ?></h5>
-			<h6 class="event-label"><?php _e( 'Data/Time:', 'groupcalendar' ); ?></h6>
+			<h6 class="event-label"><?php _e( 'Date/Time:', 'groupcalendar' ); ?></h6>
 			<?php echo $event_time; ?>
 			<span
 				class="activity"><?php echo bgc_date_display( $event->event_time, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) ); ?></span>
@@ -2047,6 +1988,23 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 					<?php echo stripslashes( $event->event_description ); ?>
 				</div>
 			<?php endif; ?>
+
+		<?php if ( $event->event_location ) : ?>
+			<h6 class="event-label"><?php _e( 'Location:', 'groupcalendar' ); ?></h6>
+			<div class="event-location">
+
+				<?php echo stripslashes( $event->event_location ); ?>
+
+				<?php if ( $event->event_map ) : ?>
+					<span class="event-map">
+    	    <a href="<?php echo $map_url; ?>" target="_blank"
+	           title="<?php _e( 'View Google Map of Event Location', 'groupcalendar' ); ?>"><?php _e( 'Map', 'groupcalendar' ); ?> &raquo;</a>
+    	  </span>
+				<?php endif; ?>
+			</div>
+		<?php endif; ?>
+
+
 		</div>
 
 		<?php
@@ -2136,13 +2094,13 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		$need = " Needed";
 		if( !empty($event_tasks)):?>
 
-		    <h6 class="event-label">Total Event Volunteers Needed:</h6> 
+		    <h6 class="event-label">Total DuGoodrs Needed:</h6> 
 		    <?php if( !empty($event->total_vols) ) echo $event->total_vols;?>
 		    <h6 class="event-label">Thank-you Message:</h6> 
 		    <!-- <p class='a21-system-message'>for testing</p> -->
 		    <?php if( !empty($event->thank_you) ) echo stripslashes($event->thank_you);?>
 				
-			<h6 class="event-label">Event Tasks & Shifts:</h6><p class='a21-system-message'>Test mode, still under development</p>
+			<h6 class="event-label">Event Tasks & Shifts:</h6><p class="a21-system-box">*NOTE* Event Huddle/Shifts in Test mode, still under development</p>
 <?php /*
 			<table id="a21_bgc_tasks_shifts" style="margin-bottom: 5px;">
 	        	<tr class="title_columns">
@@ -2215,7 +2173,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 						 $vol_hide_btn = false;
 						 $show_cancel_my_attandance = false;
-   				 		 $cancel_my_attandance_html = "<button class='a21_cancel_my_attandance' data-s-need-cnt='".$still_need_count."'' data-i='".$k2."' data-task-id='".$task->id."' data-user-id='".$cur_user->ID."'>cancel my attandance</button>";
+   				 		 $cancel_my_attandance_html = "<button class='a21_cancel_my_attandance' data-s-need-cnt='".$still_need_count."'' data-i='".$k2."' data-task-id='".$task->id."' data-user-id='".$cur_user->ID."'>cancel my attendance</button>";
 
 
 		        		 if( !empty($task->ids_vols[$k2]) ){
@@ -2268,7 +2226,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		 // echo '<br>vol_hide_btn ='; var_dump($vol_hide_btn);
 		        		 if(!$vol_hide_btn && is_user_logged_in() ):
 		        		 ?>
-			        		 <button class="a21_add_new_volunteer" data-s-need-cnt="<?php echo $still_need_count;?>" data-i="<?php echo $k2;?>" data-id="<?php echo $cur_user->ID;?>" data-nick="<?php echo $cur_user->data->user_nicename;?>">i want to attend</button>
+			        		 <button class="a21_add_new_volunteer" data-s-need-cnt="<?php echo $still_need_count;?>" data-i="<?php echo $k2;?>" data-id="<?php echo $cur_user->ID;?>" data-nick="<?php echo $cur_user->data->user_nicename;?>">i will volunteer</button>
 		        		 <?php endif;?>
 		        		 <?php 
 		        		 if(!$vol_hide_btn && !is_user_logged_in() ):
@@ -2325,7 +2283,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 		/*
 		if( !empty($event_tasks)):
-			echo '<h6 class="event-label">Total Event Volunteers Needed:</h6>'.$event_tasks['total-volunteers'].$need;
+			echo '<h6 class="event-label">Total DuGoodrs Needed:</h6>'.$event_tasks['total-volunteers'].$need;
 			unset($event_tasks['total-volunteers']);
 		 ?>
 <!-- 
@@ -2352,20 +2310,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		 /**** a21 ******/ 
 		?>
 
-		<?php if ( $event->event_location ) : ?>
-			<h6 class="event-label"><?php _e( 'Location:', 'groupcalendar' ); ?></h6>
-			<div class="event-location">
-
-				<?php echo stripslashes( $event->event_location ); ?>
-
-				<?php if ( $event->event_map ) : ?>
-					<span class="event-map">
-    	    <a href="<?php echo $map_url; ?>" target="_blank"
-	           title="<?php _e( 'View Google Map of Event Location', 'groupcalendar' ); ?>"><?php _e( 'Map', 'groupcalendar' ); ?> &raquo;</a>
-    	  </span>
-				<?php endif; ?>
-			</div>
-		<?php endif; ?>
+		
 		
 		<p class="a21-system-box">Additional custom fields is still under development. Coming soon. Now you can only add or edit the image</p>
 
@@ -2690,7 +2635,7 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 
 			<?php
 			/**** a21 ******/
-			if($event_image) {?> <img class="bgc-event-image" src="<?php echo $event_image;?>" alt=""><?php }
+			if($event_image) {?> <img src="<?php echo $event_image;?>" alt=""><?php }
 			 /**** a21 ******/ 
 			 ?>
 			<label for="a21_image_upload"><?php _e( 'Event image', 'groupcalendar' ); ?> </label>
@@ -2760,8 +2705,7 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 					<th class="a21_dinam_th_coll"> Task item </th>
 					<?php foreach ($event_times as $k => $v):?>
 						<th class="a21_dinam_th_coll"> 
-							 <input type="text" name="new_event_tasks[time][<?php echo $v->id;?>]" value="<?php echo $v->time;?>"/>
-							 <!-- <input type="text" name="new_event_tasks[time][<?php echo $k;?>]" value="<?php echo $v->time;?>"/> -->
+							 <input type="text" name="new_event_tasks[time][<?php echo $k;?>]" value="<?php echo $v->time;?>"/>
 						 </th>
 					<?php endforeach;?>
 				</tr>
@@ -2770,16 +2714,14 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 
 					<tr class="a21_dinam_row" data-task_id="<?php echo $task->id;?>">
 						<td class="a21_dinam_coll"> 								
-						 <input type="text" name="new_event_tasks[<?php echo $task->id; ?>][task]" value="<?php echo $task->task_title;?>"/>
-						 <!--<input type="text" name="new_event_tasks[<?php echo $k;?>][task]" value="<?php echo $task->task_title;?>"/>-->
+						 <input type="text" name="new_event_tasks[<?php echo $k;?>][task]" value="<?php echo $task->task_title;?>"/>
 					   </td>
 
 						<?php foreach ($task->cnt_vols as $k2 => $cnt):?>
 							<?php
 							?>
 							<td class="a21_dinam_coll">
-								<input type="text" name="new_event_tasks[<?php echo $task->id;?>][<?php echo $k2;?>]" value="<?php echo $cnt;?>" /></td>
-								<!--<input type="text" name="new_event_tasks[<?php echo $k;?>][<?php echo $k2;?>]" value="<?php echo $cnt;?>" /></td>-->
+								<input type="text" name="new_event_tasks[<?php echo $k;?>][<?php echo $k2;?>]" value="<?php echo $cnt;?>" /></td>
 						<?php endforeach;?>
 					</tr>
 				<?php endforeach;?>
