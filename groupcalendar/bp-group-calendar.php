@@ -1556,6 +1556,9 @@ function bp_group_calendar_event_is_delete() {
 
 		//delete event
 		$result = $wpdb->query( $wpdb->prepare( "DELETE FROM " . $wpdb->base_prefix . "bp_groups_calendars WHERE id = %d AND group_id = %d LIMIT 1", $event_id, $group_id ) );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM " . $wpdb->base_prefix . "bp_groups_bgc_tasks WHERE event_id = %d", $event_id ) );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM " . $wpdb->base_prefix . "bp_groups_bgc_time WHERE event_id = %d", $event_id ) );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM " . $wpdb->base_prefix . "bp_groups_groupmeta WHERE group_id = %d AND meta_key=%s", $event_id,'a21_bgc_event_image' ) );
 
 		if ( ! $result ) {
 			bp_core_add_message( __( "There was a problem deleting", 'groupcalendar' ), 'error' );
