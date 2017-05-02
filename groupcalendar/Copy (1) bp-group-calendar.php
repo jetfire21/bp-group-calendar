@@ -756,6 +756,64 @@ function bp_group_calendar_event_save() {
 
 		//editing previous event
 		if ( isset( $_POST['event-id'] ) ) {
+			
+			if( !empty( $_POST['new_event_tasks']) && $_POST['new_event_tasks'] > 1){
+
+				// sanitizing input data
+				foreach ($_POST['new_event_tasks']['time'] as $k => $time) {
+					$esc_post['new_event_tasks']['time'][$k] = sanitize_text_field($time);
+				}
+
+				foreach ($_POST['new_event_tasks'] as $k => $item) {
+					// echo "k-".$k."<br>";
+					// print_r($item);
+					if($k !== "time") {
+						// echo "<br>item task= ".$item['task']."<br>";
+						$esc_post['new_event_tasks'][$k]['task'] = sanitize_text_field($item['task']);
+						foreach ($item as $k2 => $v) {
+							if($k2 !== "task") { $esc_post['new_event_tasks'][$k][$k2] = (int)$v;}
+						}
+					}
+				}
+			}
+
+			$times = $esc_post['new_event_tasks']['time'];
+			unset($esc_post['new_event_tasks']['time']);
+
+			foreach ($times as $k => $v) {
+				$wpdb->update( $wpdb->prefix."bp_groups_bgc_time",
+					array( 'time' => $v),
+					array( 'id' => $k ),
+					array( '%s'),
+					array( '%d' )
+				);
+			}
+
+			echo "after parsing";
+			alex_debug(0,1,"times",$times);
+			alex_debug(0,1,"new_event_tasks",$esc_post['new_event_tasks']);
+			foreach ($esc_post['new_event_tasks'] as $k => $item) {
+				// var_dump($item);
+				$str_cnt_vols = "";
+				foreach ($item as $k2 => $v) {
+					// echo $v. " ";
+					// echo $k2. " ";
+					if($k2 === "task") $title_task = $v;
+					else $str_cnt_vols .= $v.",";
+					// echo $k2." ";
+				}
+				$str_cnt_vols = substr($str_cnt_vols, 0,-1);
+				echo $title_task." id-".$k.": ".$str_cnt_vols."<br>";
+
+				$wpdb->update( $wpdb->prefix."bp_groups_bgc_tasks",
+					array( 'task_title' => $title_task, "cnt_vols"=> $str_cnt_vols),
+					array( 'id' => $k ),
+					array( '%s','%s' ),
+					array( '%d' )
+				);
+
+			}
+			// здесь остановился
 
 			//can user modify this event?
 			if ( $calendar_capabilities == 'limited' ) {

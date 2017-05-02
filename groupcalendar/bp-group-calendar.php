@@ -164,9 +164,9 @@ function a21_bgc_message_thankyou(){
 
 			// echo $i."- ".$event->event_title." ".$event->event_time; echo "<br>";
 			// $get_tasks_by_event_id = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id = %d AND ids_vols REGEXP
-			// 	'^2,|,2,|,2$|^2:|:2:|:2$|^2$' ", (int)$event->id ) );
+			// 	'^2,|,2,|,2$|^2:|:2:|:2$|^2$'|:2,|,2: ", (int)$event->id ) );
 			$get_tasks_by_event_id = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id = %d AND ids_vols REGEXP
-				'^{$user_id_isnotlogin},|,{$user_id_isnotlogin},|,{$user_id_isnotlogin}$|^{$user_id_isnotlogin}:|:{$user_id_isnotlogin}:|:{$user_id_isnotlogin}$|^{$user_id_isnotlogin}$' ", (int)$event->id ) );
+				'^{$user_id_isnotlogin},|,{$user_id_isnotlogin},|,{$user_id_isnotlogin}$|^{$user_id_isnotlogin}:|:{$user_id_isnotlogin}:|:{$user_id_isnotlogin}$|^{$user_id_isnotlogin}$|:{$user_id_isnotlogin},|,{$user_id_isnotlogin}:' LIMIT 1", (int)$event->id ) );
 			// deb_last_query();
 			// alex_debug(0,1,"",$get_tasks_by_event_id,1);
 
@@ -174,6 +174,7 @@ function a21_bgc_message_thankyou(){
 
 				// $event_time = bgc_date_display( $event->event_time, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) );
 				if( empty($event->thank_you )) return false;
+
 				$event_time = strtotime($event->event_time);
 				$event_time = date("d M Y",$event_time);
 				$group = groups_get_group(array( 'group_id' => $event->group_id ));
@@ -2555,12 +2556,12 @@ function bp_group_calendar_widget_create_event( $date ) {
 			</table>
 			<div class="wrap_btns_for_event_tasks">
 				<div class="d_btn_left">
-					<div id="a21_bgc_add_new_row" style="cursor: pointer;">+ Add New Row</div>
-					<div id="a21_bgc_add_new_column" style="cursor: pointer;">+ Add New Column</div>
+					<div id="a21_bgc_add_new_row">+ Add New Row</div>
+					<div id="a21_bgc_add_new_column">+ Add New Column</div>
 				</div>
 				<div class="d_btn_right">
-					<div id="a21_bgc_del_row" style="cursor: pointer;">[x] Delete Row</div>
-					<div id="a21_bgc_del_column" style="cursor: pointer;">[x] Delete Column</div>
+					<div id="a21_bgc_del_row">[x] Delete Row</div>
+					<div id="a21_bgc_del_column">[x] Delete Column</div>
 				</div>
 			</div>
 			<br>
@@ -2845,13 +2846,26 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 						<?php foreach ($task->cnt_vols as $k2 => $cnt):?>
 							<?php
 							?>
-							<td class="a21_dinam_coll">
+							<td class="a21_dinam_coll vol_cnt">
 								<!-- <input type="text" name="new_event_tasks[<?php echo $k;?>][<?php echo $k2;?>]" value="<?php echo $cnt;?>" /></td> -->
 								<input type="text" name="new_event_tasks[<?php echo $task->id;?>][<?php echo $k2;?>]" value="<?php echo $cnt;?>" /></td>
 						<?php endforeach;?>
 					</tr>
 				<?php endforeach;?>
 			</table>
+			<?php if( empty($event_tasks)):?>
+			<div class="wrap_btns_for_event_tasks">
+				<div class="d_btn_left">
+					<div id="a21_bgc_add_new_row">+ Add New Row</div>
+					<div id="a21_bgc_add_new_column" >+ Add New Column</div>
+				</div>
+				<div class="d_btn_right">
+					<div id="a21_bgc_del_row">[x] Delete Row</div>
+					<div id="a21_bgc_del_column">[x] Delete Column</div>
+				</div>
+			</div>
+			<?php endif;?>
+
 
 			<?php /* **** as21  for EDIT EVENT **** */ ?>
 
