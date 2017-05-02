@@ -141,8 +141,10 @@ add_action("a21_bgc_message_thankyou","a21_bgc_message_thankyou");
 
 function a21_bgc_message_thankyou(){
 
-	global $wpdb;
-	echo "<h3>TESTING a21_bgc_output_thankyou today:".date( 'Y-m-d H:i:s' )."</h3>";
+	global $wpdb,$bp;
+	$user_id_isnotlogin = $bp->displayed_user->id;
+
+	// echo "<h3>TESTING a21_bgc_output_thankyou <br>today:".date( 'Y-m-d H:i:s' )."</h3>";
 	// event_time >= '" . date( 'Y-m-d H:i:s' )
 	$events = $wpdb->get_results( $wpdb->prepare(
 		"SELECT * 
@@ -152,9 +154,71 @@ function a21_bgc_message_thankyou(){
 		date( 'Y-m-d H:i:s' )
 	) );
 	// alex_debug(1,1,"",$events);
-	if(!empty($events)){
+
+	$i = 1;
+	$event_to_timeline = array();
+
+	if( !empty($events) ){
+
 		foreach ($events as $event) {
-			echo $event->event_title." ".$event->event_time; echo "<br>";
+
+			// echo $i."- ".$event->event_title." ".$event->event_time; echo "<br>";
+			// $get_tasks_by_event_id = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id = %d AND ids_vols REGEXP
+			// 	'^2,|,2,|,2$|^2:|:2:|:2$|^2$' ", (int)$event->id ) );
+			$get_tasks_by_event_id = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id = %d AND ids_vols REGEXP
+				'^{$user_id_isnotlogin},|,{$user_id_isnotlogin},|,{$user_id_isnotlogin}$|^{$user_id_isnotlogin}:|:{$user_id_isnotlogin}:|:{$user_id_isnotlogin}$|^{$user_id_isnotlogin}$' ", (int)$event->id ) );
+			// deb_last_query();
+			// alex_debug(0,1,"",$get_tasks_by_event_id,1);
+
+			if( !empty($get_tasks_by_event_id) ) {
+
+				// $event_time = bgc_date_display( $event->event_time, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) );
+				if( empty($event->thank_you )) return false;
+				$event_time = strtotime($event->event_time);
+				$event_time = date("d M Y",$event_time);
+				$group = groups_get_group(array( 'group_id' => $event->group_id ));
+				$group_permalink =  'http://'.$_SERVER['HTTP_HOST'] . '/' . bp_get_groups_root_slug() . '/' . $group->slug . '/';
+				$avatar_options = array ( 'item_id' => $group->id, 'object' => 'group', 'type' => 'full', 'avatar_dir' => 'group-avatars', 'alt' => 'Group avatar', 'css_id' => 1234, 'class' => 'avatar', 'width' => 50, 'height' => 50, 'html' => false );
+				$gr_avatar = bp_core_fetch_avatar($avatar_options);
+
+				// echo $debug = $event->thank_you."..".$event->event_title."___".$event_time." ".$html."<br>";
+				/*
+				$event_to_timeline[]['title'] = $event->event_title;
+				$event_to_timeline[]['group_id'] = $event->group_id;
+				$event_to_timeline[]['thank_you'] = $event->thank_you;
+				$event_to_timeline[]['event_time'] = $event->event_time;
+				*/
+				?>
+			      <li>
+			          <div class="timeliner_element is_event_thank_you">
+						<!-- <span class="timeliner_element2 <?php // echo $group->name;?>"></span> -->						        
+			              <div class="timeliner_title">
+			                  <span class="timeliner_label"><?php echo stripslashes($event->event_title);?></span>
+			                  <span class="timeliner_date"><?php echo $event_time;?></span>
+			              </div>
+			              <div class="content">
+			              	   <?php echo stripslashes($event->thank_you);?>
+			              </div>
+			              <div class="readmore">
+			              	  <?php if($gr_avatar):?> <div id="alex_gr_avatar"><?php echo $gr_avatar;?></div><?php endif;?>
+			              	  <?php if($group_permalink):?> <div id="alex_gr_link"><?php echo $group_permalink;?></div><?php endif;?>
+			              	  <?php if($group->name):?> 
+			              	  	 <div id="alex_gr_name_select"><?php echo $group->name;?></div>
+			              	  <?php endif;?>
+<!-- 			              	  <?php if($group->id):?> <div id="alex_gr_id_select"><?php echo $group->id;?></div><?php endif;?>
+			              	  <span class="alex_item_id"><?php echo $field->ID;?></span>
+			                  <a class="btn btn-primary" href="javascript:void(0);" ><i class="fa fa-pencil fa fa-white"></i></a>
+			                  <a class="btn btn-bricky" href="javascript:void(0);" ><i class="fa fa-trash fa fa-white"></i></a>
+			                  <a href="#" class="btn btn-info">
+			                      Read More <i class="fa fa-arrow-circle-right"></i>
+			                  </a>
+ -->			              </div>
+			          </div>
+			      </li>
+			<?php
+			}
+			// echo "<br>";
+			$i++;
 		}
 	}
 
