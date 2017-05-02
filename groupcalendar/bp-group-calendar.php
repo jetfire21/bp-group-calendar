@@ -2230,9 +2230,9 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 		    <h6 class="event-label">Total DuGoodrs Needed:</h6> 
 		    <?php if( !empty($event->total_vols) ) echo $event->total_vols;?>
-		    <h6 class="event-label">Thank-you Message:</h6> 
+		    <!-- <h6 class="event-label">Thank-you Message:</h6>  -->
 		    <!-- <p class='a21-system-message'>for testing</p> -->
-		    <?php if( !empty($event->thank_you) ) echo stripslashes($event->thank_you);?>
+		    <?php //if( !empty($event->thank_you) ) echo stripslashes($event->thank_you); ?>
 				
 			<h6 class="event-label">Event Tasks & Shifts:</h6><p class="a21-system-box">*NOTE* Event Huddle/Shifts in Test mode, still under development</p>
 <?php /*
