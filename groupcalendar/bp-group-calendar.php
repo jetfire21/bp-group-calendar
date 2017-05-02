@@ -400,6 +400,7 @@ function a21_bgc_add_new_volunteer(){
 
 	if( !empty($_POST['user_id']) ) $user_id = (int)$_POST['user_id'];
 	if( !empty($_POST['task_id']) ) $task_id = (int)$_POST['task_id'];
+	if( !empty($_POST['event_id']) ) $event_id = (int)$_POST['event_id'];
 	$i = (int)$_POST['i'];
 	$num_cur_column = $i;
 
@@ -411,12 +412,14 @@ function a21_bgc_add_new_volunteer(){
 	// $debug .= "<br>\r\n"; var_dump($i);
 	// exit;
 
+	if( empty($user_id) or empty($task_id) or empty($event_id)) return false;
+
 	global $wpdb;
-	$event_task = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE id = %d", $_POST['task_id'] ) );
+	$event_task = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE id = %d", $task_id ) );
 	// deb_last_query();
-    $times = $wpdb->get_col( "SELECT `time` FROM {$wpdb->prefix}bp_groups_bgc_time WHERE event_id='".$_POST['event_id']."'");
+    $times = $wpdb->get_col( "SELECT `time` FROM {$wpdb->prefix}bp_groups_bgc_time WHERE event_id='".$event_id."'");
     $signup_time = $times[$i];
-    $column_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}bp_groups_bgc_time WHERE event_id='".$_POST['event_id']."'");
+    $column_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}bp_groups_bgc_time WHERE event_id='".$event_id."'");
 	// print_r($times);
 	// exit;
 	// print_r($event_task);
@@ -430,20 +433,20 @@ function a21_bgc_add_new_volunteer(){
 	    if( $column_count > 1 ){
 		    for($qq=0; $qq<$column_count; $qq++){
 		    	// format record ids_vols 2,3:3,4,2:2,1,2 	// ::1 or 1:: or :1:
-		    	if($qq==$num_cur_column) { $val .= $_POST['user_id'];}
+		    	if($qq==$num_cur_column) { $val .= $user_id;}
 		    	else { $val .= ""; if($qq < $column_count) $val .= ":";}
 		    	// if($i==$num_cur_column) { $val .= $_POST['user_id']; if($i == 0) $val .= ":";}
 		    	// else { $val .= ""; if($i < $column_count) $val .= "0:";}
 		    }
 		}
-		if($column_count == 1) $val = $_POST['user_id'];
+		if($column_count == 1) $val = $user_id;
 
 	    // echo $debug .= "\r\n if empty val ids_vols=".$val;
 	    // exit;
 
 		$wpdb->update( $wpdb->prefix."bp_groups_bgc_tasks",
 			array( 'ids_vols' => $val ),
-			array( 'id' => $_POST['task_id'] ),
+			array( 'id' => $task_id ),
 			array( '%s' ),
 			array( '%d' )
 		);
@@ -457,8 +460,8 @@ function a21_bgc_add_new_volunteer(){
 			$ids_vols = explode(":",$event_task->ids_vols);
 			// $debug .= "ids_vols is not empty!";
 			// $debug .= "arr vols cur task=".$ids_vols[$_POST['i']];
-			if( !empty($ids_vols[$_POST['i']]) ) $ids_vols[$_POST['i']] .= ",".$_POST['user_id'];
-			else $ids_vols[$_POST['i']] = $_POST['user_id'];
+			if( !empty($ids_vols[$i]) ) $ids_vols[$i] .= ",".$user_id;
+			else $ids_vols[$i] = $user_id;
 			// print_r($ids_vols);
 			 $ids_vols = implode(":", $ids_vols);
 			// exit;
@@ -472,7 +475,7 @@ function a21_bgc_add_new_volunteer(){
 
 		$wpdb->update( $wpdb->prefix."bp_groups_bgc_tasks",
 			array( 'ids_vols' => $ids_vols ),
-			array( 'id' => $_POST['task_id'] ),
+			array( 'id' => $task_id ),
 			array( '%s' ),
 			array( '%d' )
 		);
@@ -486,16 +489,16 @@ function a21_bgc_add_new_volunteer(){
 
 	}
 
-// exit;
+		// exit;
 
 
-////////////////// upgrade
+		////////////////// upgrade
 
 		// join current user to cur group
 		as21_groups_action_join_group();
 
 		// counter current actyally count voluteers
-		$event_task = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE id = %d", $_POST['task_id'] ) );
+		$event_task = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE id = %d", $task_id ) );
 		// echo $debug .= "\r\n repeat query to bd tasks get actyally task \r\n";
 		// alex_debug(0,1,"",$event_task);
 
@@ -577,7 +580,7 @@ function a21_bgc_add_new_volunteer(){
 			}
 		}
 
-		as21_bp_group_calendar_event_add_action_message( $_POST['user_id'], $_POST['event_id'], $event_task->task_title, $signup_time );
+		as21_bp_group_calendar_event_add_action_message( $user_id, $event_id, $event_task->task_title, $signup_time );
 		// $debug .= as21_get_user_link_and_avatar($user_id, false);
 
 		 // $debug .= "<p class='a21-system-message'>new markup from ajax after click signup</p>";
@@ -585,7 +588,7 @@ function a21_bgc_add_new_volunteer(){
 		 // echo $debug;
 		 $js['html'] = $debug;
 		 echo json_encode($js);
-///////////////////
+	///////////////////
 
 	// $ids_ = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id='11'");
 	// $wpdb->update( $wpdb->posts,
