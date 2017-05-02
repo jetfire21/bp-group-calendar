@@ -924,6 +924,65 @@ function bp_group_calendar_event_save() {
 		//editing previous event
 		if ( isset( $_POST['event-id'] ) ) {
 
+			if( !empty( $_POST['new_event_tasks']) && $_POST['new_event_tasks'] > 1){
+
+				// sanitizing input data
+				foreach ($_POST['new_event_tasks']['time'] as $k => $time) {
+					$esc_post['new_event_tasks']['time'][$k] = sanitize_text_field($time);
+				}
+
+				foreach ($_POST['new_event_tasks'] as $k => $item) {
+					// echo "k-".$k."<br>";
+					// print_r($item);
+					if($k !== "time") {
+						// echo "<br>item task= ".$item['task']."<br>";
+						$esc_post['new_event_tasks'][$k]['task'] = sanitize_text_field($item['task']);
+						foreach ($item as $k2 => $v) {
+							if($k2 !== "task") { $esc_post['new_event_tasks'][$k][$k2] = (int)$v;}
+						}
+					}
+				}
+			}
+
+			$times = $esc_post['new_event_tasks']['time'];
+			unset($esc_post['new_event_tasks']['time']);
+
+			foreach ($times as $k => $v) {
+				$wpdb->update( $wpdb->prefix."bp_groups_bgc_time",
+					array( 'time' => $v),
+					array( 'id' => $k ),
+					array( '%s'),
+					array( '%d' )
+				);
+			}
+
+			// echo "after parsing";
+			// alex_debug(0,1,"times",$times);
+			// alex_debug(0,1,"new_event_tasks",$esc_post['new_event_tasks']);
+			foreach ($esc_post['new_event_tasks'] as $k => $item) {
+				// var_dump($item);
+				$str_cnt_vols = "";
+				foreach ($item as $k2 => $v) {
+					// echo $v. " ";
+					// echo $k2. " ";
+					if($k2 === "task") $title_task = $v;
+					else $str_cnt_vols .= $v.",";
+					// echo $k2." ";
+				}
+				$str_cnt_vols = substr($str_cnt_vols, 0,-1);
+				// echo $title_task." id-".$k.": ".$str_cnt_vols."<br>";
+
+				$wpdb->update( $wpdb->prefix."bp_groups_bgc_tasks",
+					array( 'task_title' => $title_task, "cnt_vols"=> $str_cnt_vols),
+					array( 'id' => $k ),
+					array( '%s','%s' ),
+					array( '%d' )
+				);
+
+			}
+			// end edit custom event fields
+
+
 			//can user modify this event?
 			if ( $calendar_capabilities == 'limited' ) {
 				$creator_id = $wpdb->get_var( $wpdb->prepare( "SELECT user_id FROM " . $wpdb->base_prefix . "bp_groups_calendars WHERE id = %d AND group_id = %d", (int) $_POST['event-id'], $group_id ) );
@@ -2769,7 +2828,8 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 					<th class="a21_dinam_th_coll"> Task item </th>
 					<?php foreach ($event_times as $k => $v):?>
 						<th class="a21_dinam_th_coll"> 
-							 <input type="text" name="new_event_tasks[time][<?php echo $k;?>]" value="<?php echo $v->time;?>"/>
+							  <input type="text" name="new_event_tasks[time][<?php echo $v->id;?>]" value="<?php echo $v->time;?>"/>
+ 							 <!-- <input type="text" name="new_event_tasks[time][<?php echo $k;?>]" value="<?php echo $v->time;?>"/> -->
 						 </th>
 					<?php endforeach;?>
 				</tr>
@@ -2778,14 +2838,16 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 
 					<tr class="a21_dinam_row" data-task_id="<?php echo $task->id;?>">
 						<td class="a21_dinam_coll"> 								
-						 <input type="text" name="new_event_tasks[<?php echo $k;?>][task]" value="<?php echo $task->task_title;?>"/>
+						 <!-- <input type="text" name="new_event_tasks[<?php echo $k;?>][task]" value="<?php echo $task->task_title;?>"/> -->
+						 <input type="text" name="new_event_tasks[<?php echo $task->id; ?>][task]" value="<?php echo $task->task_title;?>"/>
 					   </td>
 
 						<?php foreach ($task->cnt_vols as $k2 => $cnt):?>
 							<?php
 							?>
 							<td class="a21_dinam_coll">
-								<input type="text" name="new_event_tasks[<?php echo $k;?>][<?php echo $k2;?>]" value="<?php echo $cnt;?>" /></td>
+								<!-- <input type="text" name="new_event_tasks[<?php echo $k;?>][<?php echo $k2;?>]" value="<?php echo $cnt;?>" /></td> -->
+								<input type="text" name="new_event_tasks[<?php echo $task->id;?>][<?php echo $k2;?>]" value="<?php echo $cnt;?>" /></td>
 						<?php endforeach;?>
 					</tr>
 				<?php endforeach;?>
