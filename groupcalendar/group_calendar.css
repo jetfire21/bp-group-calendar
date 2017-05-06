@@ -184,7 +184,7 @@ table.calendar td.pad:hover {
 #a21_bgc_add_new_row, #a21_bgc_add_new_column{display: table;}
 #a21_bgc_add_new_row, #a21_bgc_add_new_column,#a21_bgc_del_row, #a21_bgc_del_column{cursor: pointer;}
 #add-event-form #total-volunteers{ width: 70px;  }
-#a21_bgc_del_row, #a21_bgc_del_column{ display: none; }
+/*#a21_bgc_del_row, #a21_bgc_del_column{ display: none; }*/
 .wrap_btns_for_event_tasks {overflow: hidden; clear: both;}
 .wrap_btns_for_event_tasks .d_btn_left {float: left;}
 .wrap_btns_for_event_tasks .d_btn_right{float: right;}

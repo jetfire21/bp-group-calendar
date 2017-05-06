@@ -2156,7 +2156,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		// $event_tasks = unserialize($event_tasks);
 
 		// $event_tasks = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id='{$event_id}'");
-		$event_tasks = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id='{$event_id}'");
+		$event_tasks = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id='{$event_id}' ORDER BY id");
 		$event_times = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_time WHERE event_id='{$event_id}'");
 
 	    // foreach ($esc_post['new_event_tasks'] as $task):
@@ -2561,18 +2561,45 @@ function bp_group_calendar_widget_create_event( $date ) {
 
 			<label for="event_tasks"><?php _e( 'Event Tasks & Shifts', 'groupcalendar' ); ?></label>
 			<!-- <input name="event_tasks" id="event_tasks" value="" type="text"> -->
+			<!--
 			<table id="a21_bgc_tasks_shifts" style="margin-bottom: 5px;">
 			<tr class="title_columns">
 				<th>Task item</th>
 			</tr>
-<!--
-			<tr>
-				<td>Runner</td>
-				<td>2 Needed</td>
-				<td>3 Needed</td>
-			</tr>
--->
 			</table>
+			-->
+			<table id="a21_bgc_tasks_shifts" style="margin-bottom: 5px;">
+			    <tbody>
+			        <tr class="title_columns">
+			            <th>Task item</th>
+			            <th class="a21_dinam_th_coll"> time 1
+			                <input type="text" name="new_event_tasks[time][0]" placeholder="11:00am-12:00am">
+			            </th>
+			            <th class="a21_dinam_th_coll"> time 2
+			                <input type="text" name="new_event_tasks[time][1]" placeholder="11:00am-12:00am">
+			            </th>
+			        </tr>
+			        <tr class="a21_dinam_row">
+			            <td class="a21_dinam_coll">
+			                <input type="text" name="new_event_tasks[0][task]" placeholder="Title task 1"> </td>
+			            <td class="a21_dinam_coll vol_cnt">
+			                <input type="text" name="new_event_tasks[0][time_1]" placeholder="2">
+			            </td>
+			            <td class="a21_dinam_coll vol_cnt">
+			                <input type="text" name="new_event_tasks[0][time_2]" placeholder="2">
+			            </td>
+			        </tr>
+			        <tr class="a21_dinam_row">
+			            <td class="a21_dinam_coll">
+			                <input type="text" name="new_event_tasks[1][task]" placeholder="Title task 2"> </td>
+			            <td class="a21_dinam_coll vol_cnt">
+			                <input type="text" name="new_event_tasks[1][time_1]" placeholder="2"> </td>
+			            <td class="a21_dinam_coll vol_cnt">
+			                <input type="text" name="new_event_tasks[1][time_2]" placeholder="2"> </td>
+			        </tr>
+			    </tbody>
+			</table>
+
 			<div class="wrap_btns_for_event_tasks">
 				<div class="d_btn_left">
 					<div id="a21_bgc_add_new_row">+ Add New Row</div>
