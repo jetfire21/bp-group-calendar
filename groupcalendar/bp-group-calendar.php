@@ -202,8 +202,10 @@ function a21_bgc_message_thankyou(){
 			                  <span class="timeliner_date"><?php echo $event_time;?></span>
 			              </div>
 			              <div class="content">
-			              	   <?php if( !empty($get_event_image) ) echo "<a href='".$group_permalink."/huddle/".$event->event_slug."' class='event_image' target='_blank'><img src='".$get_event_image."' /></a>";
+			              	   <?php if( !empty($get_event_image) ) {
+			              	    echo "<a href='".$group_permalink."/huddle/".$event->event_slug."' class='event_image' target='_blank'><img src='".$get_event_image."' /></a>";
 			              	    echo "<p>".stripslashes($event->thank_you)."</p>";
+			              	    }else echo stripslashes($event->thank_you);
 			              	    ?>
 			              </div>
 			              <div class="readmore">
