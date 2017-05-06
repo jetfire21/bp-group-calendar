@@ -558,7 +558,7 @@ function a21_bgc_add_new_volunteer(){
 		$still_need_count = $cnt_primary_vols - $cnt_vols_signup_now;
 		// $debug .= '<button class="a21_add_new_volunteer" data-s-need-cnt="'.$still_need_count.'" data-i="'.$i.'" data-id="'.$user_id.'" data-nick="test">signup</button><p><span class="vol_cnt">'.$still_need_count.'</span> Needed</p>';
 
-		if($cnt_primary_vols == $cnt_vols_signup_now ) { $js['full'] = true; /* $debug .= "<p>Full</p>"; */}
+		if($cnt_primary_vols == $cnt_vols_signup_now ) { $js['full'] = true;  $debug .= "<p>FULL</p>"; }
 		else $debug .= "<p class='still_need'><span class='vol_cnt'>".$still_need_count."</span> Needed</p>";
 
 		$debug .= "<button class='a21_cancel_my_attandance' data-s-need-cnt='".$still_need_count."'' data-i='".$i."' data-task-id='".$task_id."' data-user-id='".$user_id."'>cancel my attandance</button>";
@@ -2305,7 +2305,8 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		 // echo "k2=".$k2."<br>";
 		        		 // echo " cnt ".$cnt." == task->ids_vols[k2] $k2, ".count($task->ids_vols[$k2]);
 		        		 // echo "<br>";
-
+							
+						 if($cur_count >= $cnt) echo "<p>FULL</p>";
  		        		 if( $still_need_count != 0 ) { echo "<p class='still_need'><span class='vol_cnt'>".$still_need_count."</span> "; echo $need."</p>"; }
 
 
