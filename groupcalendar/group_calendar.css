@@ -199,6 +199,7 @@ table.calendar-view {margin:0;}
 .bgc-event-details-left{ float:left; width:60%; }
 .bgc-event-image { max-width: 39% !important; }
 #ui-datepicker-div{ z-index: 99999 !important; }
+
 /* ******* PAGE CALENDAR ********* */
 
 @media only screen and (max-width: 992px){

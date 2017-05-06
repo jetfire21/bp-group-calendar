@@ -175,6 +175,9 @@ function a21_bgc_message_thankyou(){
 				// $event_time = bgc_date_display( $event->event_time, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) );
 				if( empty($event->thank_you )) return false;
 
+				$get_event_image = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM " . $wpdb->base_prefix . "bp_groups_groupmeta
+            	WHERE group_id=%d AND meta_key=%s LIMIT 1", (int)$event->id, 'a21_bgc_event_image') );
+
 				$event_time = strtotime($event->event_time);
 				$event_time = date("d M Y",$event_time);
 				$group = groups_get_group(array( 'group_id' => $event->group_id ));
@@ -189,6 +192,7 @@ function a21_bgc_message_thankyou(){
 				$event_to_timeline[]['thank_you'] = $event->thank_you;
 				$event_to_timeline[]['event_time'] = $event->event_time;
 				*/
+
 				?>
 			      <li>
 			          <div class="timeliner_element is_event_thank_you">
@@ -198,7 +202,9 @@ function a21_bgc_message_thankyou(){
 			                  <span class="timeliner_date"><?php echo $event_time;?></span>
 			              </div>
 			              <div class="content">
-			              	   <?php echo stripslashes($event->thank_you);?>
+			              	   <?php if( !empty($get_event_image) ) echo "<a href='".$group_permalink."/huddle/".$event->event_slug."' class='event_image' target='_blank'><img src='".$get_event_image."' /></a>";
+			              	    echo "<p>".stripslashes($event->thank_you)."</p>";
+			              	    ?>
 			              </div>
 			              <div class="readmore">
 			              	  <?php if($gr_avatar):?> <div id="alex_gr_avatar"><?php echo $gr_avatar;?></div><?php endif;?>
