@@ -1042,9 +1042,11 @@ function bp_group_calendar_event_save() {
 
 				    // group_id will be insert new_event_id
 					$query = $wpdb->prepare( "UPDATE " . $wpdb->base_prefix . "bp_groups_groupmeta
-				                	SET group_id=%d, meta_key=%s, meta_value=%s LIMIT 1
-				                	", (int) $_POST['event-id'], 'a21_bgc_event_image',$movefile['url'] );
+				                	SET meta_value=%s WHERE group_id=%d AND meta_key=%s LIMIT 1
+				                	",$movefile['url'],(int) $_POST['event-id'], 'a21_bgc_event_image' );
 					$wpdb->query( $query );
+					// deb_last_query();
+					// exit;
 
 				} else {
 				    // echo $movefile['error'];
