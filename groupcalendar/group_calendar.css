@@ -202,6 +202,12 @@ table.calendar-view {margin:0;}
 #ui-datepicker-div tr td { padding: 0 !important; }
 #ui-datepicker-div table{ margin:0 !important; }
 #ui-datepicker-div select{ height: 25px; border-bottom: 0; }
+
+.events-list li{ padding-bottom: 8px; }
+.events-list span{ font-weight: 600; }
+.events-list .as21_event_image{  height: 40px; width: 60px; /*margin-right: 10px;*/ float: left; margin-top: 6px; margin-right: 10px;}
+.events-list .event_title { display: block; }
+
 /* ******* PAGE CALENDAR ********* */
 
 @media only screen and (max-width: 992px){

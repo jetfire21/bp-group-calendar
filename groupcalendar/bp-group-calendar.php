@@ -1878,16 +1878,25 @@ function bp_group_calendar_list_events( $group_id, $range, $date = '', $calendar
 		foreach ( $events as $event ) {
 			$class = ( $event->user_id == $current_user->ID ) ? ' class="my_event"' : '';
 
-			$events_list .= "\n<li" . $class . ">";
+			$event_image = $wpdb->get_var( "SELECT meta_value FROM {$wpdb->prefix}bp_groups_groupmeta WHERE group_id='".$event->id."' AND meta_key='a21_bgc_event_image'");
+			// deb_last_query();
+			$img = (!empty($event_image)) ? "<img class='as21_event_image' src='".$event_image."' />" : '';
 
-			$events_list .= '<a href="' . bp_group_calendar_create_event_url( $event->id ) . '" title="'. __( 'View Event', 'groupcalendar' ) . '" class="event_title">' . bgc_date_display( $event->event_time, $date_format ) . ': ' . stripslashes( $event->event_title ) .'</a>';
+			$events_list .= "\n<li" . $class . ">".$img;
+
+			$event_url .= bp_group_calendar_create_event_url( $event->id);
+			// $link_start .= '<a href="' . bp_group_calendar_create_event_url( $event->id ) . '" title="'. __( 'View Event', 'groupcalendar' ) . '" >';
+			// $events_list .= '<a href="' . bp_group_calendar_create_event_url( $event->id ) . '" title="'. __( 'View Event', 'groupcalendar' ) . '" class="event_title">' . bgc_date_display( $event->event_time, $date_format ) . ': ' . stripslashes( $event->event_title ) .'</a>';
+			$events_list .= '<a href="' . $event_url . '" title="'. __( 'View Event', 'groupcalendar' ) . '" class="event_title">'.stripslashes( $event->event_title ) .'</a>';
 
 			//add edit link if allowed
 			if ( $calendar_capabilities == 'full' || ( $calendar_capabilities == 'limited' && $event->user_id == $current_user->ID ) ) {
 				$events_list .= ' | <a href="' . bp_group_calendar_create_event_url( $event->id, true ) . '" title="' . __( 'Edit Event', 'groupcalendar' ) . '">' . __( 'Edit', 'groupcalendar' ) . ' &raquo;</a>';
 			}
+			$events_list .= '<a href="' . $event_url . '" title="'. __( 'View Event', 'groupcalendar' ) . '" class="">'.bgc_date_display( $event->event_time, $date_format ).'</a>';
 
-			$events_list .= "</li>";
+			$events_list .= " <span>Volunteers Needed: ".$event->total_vols."</span>
+							</li>";
 		}
 		$events_list .= "</ul>";
 
