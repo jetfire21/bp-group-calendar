@@ -1887,13 +1887,15 @@ function bp_group_calendar_list_events( $group_id, $range, $date = '', $calendar
 			$event_url .= bp_group_calendar_create_event_url( $event->id);
 			// $link_start .= '<a href="' . bp_group_calendar_create_event_url( $event->id ) . '" title="'. __( 'View Event', 'groupcalendar' ) . '" >';
 			// $events_list .= '<a href="' . bp_group_calendar_create_event_url( $event->id ) . '" title="'. __( 'View Event', 'groupcalendar' ) . '" class="event_title">' . bgc_date_display( $event->event_time, $date_format ) . ': ' . stripslashes( $event->event_title ) .'</a>';
-			$events_list .= '<a href="' . $event_url . '" title="'. __( 'View Event', 'groupcalendar' ) . '" class="event_title">'.stripslashes( $event->event_title ) .'</a>';
+			$events_list .= '<p class="link_title_edit">
+			<a href="' . $event_url . '" title="'. __( 'View Event', 'groupcalendar' ) . '" class="event_title">'.stripslashes( $event->event_title ) .'</a>';
 
 			//add edit link if allowed
 			if ( $calendar_capabilities == 'full' || ( $calendar_capabilities == 'limited' && $event->user_id == $current_user->ID ) ) {
 				$events_list .= ' | <a href="' . bp_group_calendar_create_event_url( $event->id, true ) . '" title="' . __( 'Edit Event', 'groupcalendar' ) . '">' . __( 'Edit', 'groupcalendar' ) . ' &raquo;</a>';
 			}
-			$events_list .= '<a href="' . $event_url . '" title="'. __( 'View Event', 'groupcalendar' ) . '" class="">'.bgc_date_display( $event->event_time, $date_format ).'</a>';
+			$events_list .= '</p>
+			 <a href="' . $event_url . '" title="'. __( 'View Event', 'groupcalendar' ) . '" class="">'.bgc_date_display( $event->event_time, $date_format ).'</a>';
 
 			$events_list .= " <span>Volunteers Needed: ".$event->total_vols."</span>
 							</li>";
