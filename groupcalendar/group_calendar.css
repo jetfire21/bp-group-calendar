@@ -197,7 +197,7 @@ table.calendar-view {margin:0;}
 .a21_dinam_coll .attendees{ clear: left;}
 
 .bgc-event-details-left{ float:left; width:60%; }
-.bgc-event-image { max-width: 39% !important; }
+.bgc-event-image { max-width: 39% !important; float:left;}
 #ui-datepicker-div{ z-index: 99999 !important; }
 #ui-datepicker-div tr td { padding: 0 !important; }
 #ui-datepicker-div table{ margin:0 !important; }
@@ -210,6 +210,96 @@ table.calendar-view {margin:0;}
 /*.events-list .event_title { display: block; }*/
 
 /* ******* PAGE CALENDAR ********* */
+
+/* ******* SOCIAL ********* */
+.share ul li {
+    float: left;
+    list-style: outside none none;
+    padding: 0 0 0 5px;
+    width: auto;
+}
+.share h4 {
+    background: none repeat scroll 0 0 #d79c75;
+    color: #030607;
+    float: left;
+    font: bold 12px/31px "Open-sans",sans-serif;
+    margin: 1px;
+    padding: 0 8px;
+    width: auto;
+}
+.share {
+    height: 32px;
+    margin: 20px 0;
+    width: auto;
+}
+/* Single Special Social Button Style*/
+.facebook {
+    background: none repeat scroll 0 0 #45619d;
+    border-radius: 1px;
+    color: #fff;
+    font: lighter 12px/32px "Arial",sans-serif;
+    padding: 8px;
+    text-align: center;
+    text-decoration: none;
+}
+.googleplus {
+    background: none repeat scroll 0 0 #e15449;
+    border-radius: 1px;
+    color: #fff;
+    font: lighter 12px/32px "Arial",sans-serif;
+    padding: 8px;
+    text-align: center;
+    text-decoration: none;
+}
+.twitter {
+    background: none repeat scroll 0 0 #55acee;
+    border-radius: 1px;
+    color: #fff;
+    font: lighter 12px/32px "Arial",sans-serif;
+    padding: 8px;
+    text-align: center;
+    text-decoration: none;
+}
+.linkedin {
+    background: none repeat scroll 0 0 #0077b5;
+    border-radius: 1px;
+    color: #fff;
+    font: lighter 12px/32px "Arial",sans-serif;
+    padding: 8px;
+    text-align: center;
+    text-decoration: none;
+}
+.pinterest {
+    background: none repeat scroll 0 0 #bd1e23;
+    border-radius: 1px;
+    color: #fff;
+    font: lighter 12px/32px "Arial",sans-serif;
+    padding: 8px;
+    text-decoration: none;
+}
+.email {
+    background: none repeat scroll 0 0 #888;
+    border-radius: 1px;
+    color: #fff;
+    font: lighter 12px/32px "Arial",sans-serif;
+    padding: 8px;
+    text-decoration: none;
+}
+12px/32px "Arial",sans-serif;
+    padding: 8px;
+    text-align: center;
+    text-decoration: none;
+}
+.pinterest {
+    background: none repeat scroll 0 0 #bd1e23;
+    border-radius: 1px;
+    color: #fff;
+    font: lighter 12px/32px "Arial",sans-serif;
+    padding: 8px;
+    text-decoration: none;
+}
+/* ******* SOCIAL ********* */
+
 
 @media only screen and (max-width: 992px){
     .bp-user #content .main{ float: none; width: 100% !important; }

@@ -1884,7 +1884,7 @@ function bp_group_calendar_list_events( $group_id, $range, $date = '', $calendar
 
 			$events_list .= "\n<li" . $class . ">".$img;
 
-			$event_url .= bp_group_calendar_create_event_url( $event->id);
+			$event_url = bp_group_calendar_create_event_url( $event->id);
 			// $link_start .= '<a href="' . bp_group_calendar_create_event_url( $event->id ) . '" title="'. __( 'View Event', 'groupcalendar' ) . '" >';
 			// $events_list .= '<a href="' . bp_group_calendar_create_event_url( $event->id ) . '" title="'. __( 'View Event', 'groupcalendar' ) . '" class="event_title">' . bgc_date_display( $event->event_time, $date_format ) . ': ' . stripslashes( $event->event_title ) .'</a>';
 			$events_list .= '<p class="link_title_edit">
@@ -2185,11 +2185,29 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 	    //  $sql = "INSERT INTO {$wpdb->prefix}bp_groups_bgc_tasks (event_id,task_title,task_time,count_vol) VALUES ".$sql;
 	    //  $wpdb->query($sql);
 
-
-		if($event_image) {?> <img class="bgc-event-image" src="<?php echo $event_image;?>" alt=""><?php }
-
+		echo "<div class='image-social bgc-event-image'>";
+		if($event_image) {?> 
+			<img class="" src="<?php echo $event_image;?>" alt="">
+		<?php }
+		$event_full_link = "http://".$_SERVER['HTTP_HOST']."/".$_SERVER['REQUEST_URI'];
 ?>
+		<div class="share"
+			<h4>Helping recruit Volunteers? If so, please share link:</h4>
+			<ul>
+			<li><a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo $event_full_link;?>" title="Share this post on Facebook" target="_blank" class="facebook">Facebook</a></li>
+			<li><a href="https://plus.google.com/share?url=<?php echo $event_full_link;?>" title="Share this on Google+" target="_blank" class="googleplus">Google+</a></li>
+			<li><a href="http://twitter.com/share?url=<?php echo $event_full_link;?>&text=<?php echo stripslashes( $event->event_title ); ?>&via=dugoodr" title="Share this post on Twitter" target="_blank" class="twitter">Twitter</a></li>
+			<!-- https://www.linkedin.com/shareArticle?mini=true&url=http%3A//dugoodr2.dev/causes/ottawa-mission/callout/new-event-3x3-19-april--ottawa-mission-s4/&title=dfsdfdf&summary=&source= -->
+			<li><a href="http://www.linkedin.com/shareArticle?mini=true&url=<?php echo $event_full_link;?>&title=<?php echo stripslashes( $event->event_title ); ?>" title="Share this post on LinkedIn" target="_blank" class="linkedin">LinkedIn</a></li>
+			<li><a href="http://www.pinterest.com/pin/create/button/?url=<?php if($event_image) echo $event_image;?>&media=<?php if($event_image) echo $event_image;?>>&description=<?php echo stripslashes( $event->event_title ); ?>" target="_blank" class="pinterest" data-pin-do='buttonPin' data-pin-config='above'>Pinterest</a></li>
+			<li><a href="mailto:?subject=<?php echo stripslashes( $event->event_title ); ?>&amp;body=<?php echo $event_full_link;?>" title="Share this with a friend!" class="email">Email</a></li>
+			</ul>
+		</div>
+		</div> <!-- end .image-social -->
+
 		<div class="clearfix"></div>
+
+
 
 <?php
 
