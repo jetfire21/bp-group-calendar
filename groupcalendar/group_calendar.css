@@ -165,7 +165,8 @@ table.calendar td.pad:hover {
 }
 
 .my_event a.event_title {
-    font-size: 110%
+    font-size: 110%;
+    font-weight: 700;
 }
 
 /* modification */

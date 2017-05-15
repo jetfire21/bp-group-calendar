@@ -135,6 +135,8 @@ function as21_bp_group_calendar_event_add_action_message( $user_id, $event_id, $
 
 /* **** as21  my functions **** */
 
+
+
 // add_action("a21_bgc_message_thankyou","a21_bgc_message_thankyou");
 
 function a21_bgc_message_thankyou(){
@@ -316,7 +318,6 @@ function a21_bgc_message_thankyou_in_timeline(){
 	}
 
 }
-
 /* **** as21 NEED FUTURE **** */
 
 /* **** as21 **** */
@@ -324,7 +325,7 @@ function a21_bgc_message_thankyou_in_timeline(){
 function as21_get_user_link_and_avatar($user_id, $iter = false){
 
 	// $debug .= "<br>function as21_get_user_link_and_avatar<br>";
-  	if( ($iter && $iter == 1) or !$iter) $debug .= "<p class='attendees'>DuGoodrs: ";
+  	if( ($iter && $iter == 1) or !$iter) $debug .= "<p class='attendees'>Attendees: ";
   	// $member_name .= "<p class='a21-system-message'>id ".$user_id."-".bp_core_get_username($user_id)."</p>";
 	$member_link = bp_core_get_userlink($user_id,false,true);	
 	$member_avatar = bp_core_fetch_avatar( array('item_id'=>$user_id, 'width'=>"30",'html'=>true));
@@ -440,7 +441,7 @@ function a21_cancel_my_attandance(){
 		$still_need_count = $cnt_primary_vols - $cnt_vols_signup_now;
 		$js['cnt_vols_signup_now'] = $cnt_vols_signup_now;
 		$need = "Needed";
-		$debug .= '<p class="still_need"><span class="vol_cnt">'.$still_need_count.'</span> '.$need.'</p><button class="a21_add_new_volunteer" data-s-need-cnt="'.$still_need_count.'" data-i="'.$i.'" data-id="'.$user_id.'" data-nick="test">i will volunteer</button>';
+		$debug .= '<p class="still_need"><span class="vol_cnt">'.$still_need_count.'</span> '.$need.'</p><button class="a21_add_new_volunteer" data-s-need-cnt="'.$still_need_count.'" data-i="'.$i.'" data-id="'.$user_id.'" data-nick="test">i want to attend</button>';
 		// echo $debug;
 		// exit;
 		// echo "ids_vols[i]= "; var_dump($ids_vols[$i]);
@@ -648,7 +649,7 @@ function a21_bgc_add_new_volunteer(){
 		if($cnt_primary_vols == $cnt_vols_signup_now ) { $js['full'] = true;  $debug .= "<p>FULL</p>"; }
 		else $debug .= "<p class='still_need'><span class='vol_cnt'>".$still_need_count."</span> Needed</p>";
 
-		$debug .= "<button class='a21_cancel_my_attandance' data-s-need-cnt='".$still_need_count."'' data-i='".$i."' data-task-id='".$task_id."' data-user-id='".$user_id."'>cancel my attendance</button>";
+		$debug .= "<button class='a21_cancel_my_attandance' data-s-need-cnt='".$still_need_count."'' data-i='".$i."' data-task-id='".$task_id."' data-user-id='".$user_id."'>cancel my attandance</button>";
 
 
 		// echo "ids_vols[i]= "; var_dump($ids_vols[$i]);
@@ -1982,7 +1983,7 @@ function bp_group_calendar_list_events( $group_id, $range, $date = '', $calendar
 			$events_list .= '</p>
 			 <a href="' . $event_url . '" title="'. __( 'View Event', 'groupcalendar' ) . '" class="">'.bgc_date_display( $event->event_time, $date_format ).'</a>';
 
-			$events_list .= " <span>&nbsp;&nbsp;Volunteers Needed: ".$event->total_vols."</span>
+			$events_list .= " <span>Volunteers Needed: ".$event->total_vols."</span>
 							</li>";
 		}
 		$events_list .= "</ul>";
@@ -2284,7 +2285,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 			<li><a href="http://twitter.com/share?url=<?php echo $event_full_link;?>&text=<?php echo stripslashes( $event->event_title ); ?>&via=dugoodr" title="Share this post on Twitter" target="_blank" class="twitter">Twitter</a></li>
 			<!-- https://www.linkedin.com/shareArticle?mini=true&url=http%3A//dugoodr2.dev/causes/ottawa-mission/callout/new-event-3x3-19-april--ottawa-mission-s4/&title=dfsdfdf&summary=&source= -->
 			<li><a href="http://www.linkedin.com/shareArticle?mini=true&url=<?php echo $event_full_link;?>&title=<?php echo stripslashes( $event->event_title ); ?>" title="Share this post on LinkedIn" target="_blank" class="linkedin">LinkedIn</a></li>
-			<!--<li><a href="http://www.pinterest.com/pin/create/button/?url=<?php if($event_image) echo $event_image;?>&media=<?php if($event_image) echo $event_image;?>&description=<?php echo stripslashes( $event->event_title ); ?>" target="_blank" class="pinterest" data-pin-do='buttonPin' data-pin-config='above'>Pinterest</a></li>-->
+			<li><a href="http://www.pinterest.com/pin/create/button/?url=<?php if($event_image) echo $event_image;?>&media=<?php if($event_image) echo $event_image;?>&description=<?php echo stripslashes( $event->event_title ); ?>" target="_blank" class="pinterest" data-pin-do='buttonPin' data-pin-config='above'>Pinterest</a></li>
 			<li><a href="mailto:?subject=<?php echo stripslashes( $event->event_title ); ?>&amp;body=<?php echo $event_full_link;?>" title="Share this with a friend!" class="email">Email</a></li>
 			</ul>
 		</div>
@@ -2357,11 +2358,8 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		    <!-- <h6 class="event-label">Thank-you Message:</h6>  -->
 		    <!-- <p class='a21-system-message'>for testing</p> -->
 		    <?php //if( !empty($event->thank_you) ) echo stripslashes($event->thank_you); ?>
-<!--			
+				
 			<h6 class="event-label">Event Tasks & Shifts:</h6><p class="a21-system-box">*NOTE* Event Callout/Shifts in Test mode, still under development</p>
--->
-<p>
-
 <?php /*
 			<table id="a21_bgc_tasks_shifts" style="margin-bottom: 5px;">
 	        	<tr class="title_columns">
@@ -2427,7 +2425,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		 // echo " cnt ".$cnt." == task->ids_vols[k2] $k2, ".count($task->ids_vols[$k2]);
 		        		 // echo "<br>";
 							
-						 if($cur_count >= $cnt) echo "<p>Awesome! this task is FULL</p>";
+						 if($cur_count >= $cnt) echo "<p>FULL</p>";
  		        		 if( $still_need_count != 0 ) { echo "<p class='still_need'><span class='vol_cnt'>".$still_need_count."</span> "; echo $need."</p>"; }
 
 
@@ -2435,7 +2433,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 						 $vol_hide_btn = false;
 						 $show_cancel_my_attandance = false;
-   				 		 $cancel_my_attandance_html = "<button class='a21_cancel_my_attandance' data-s-need-cnt='".$still_need_count."'' data-i='".$k2."' data-task-id='".$task->id."' data-user-id='".$cur_user->ID."'>cancel my volunteering</button>";
+   				 		 $cancel_my_attandance_html = "<button class='a21_cancel_my_attandance' data-s-need-cnt='".$still_need_count."'' data-i='".$k2."' data-task-id='".$task->id."' data-user-id='".$cur_user->ID."'>cancel my attendance</button>";
 
 
 		        		 if( !empty($task->ids_vols[$k2]) ){
@@ -2501,7 +2499,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 /* important for debug
 		        		  echo "<p class='a21-system-message'>current count vols=".$cur_count."</p>";
-		        		  if($cur_count >= $cnt) echo "<p class='a21-system-message'>full -</p>";
+		        		  if($cur_count >= $cnt) echo "<p class='a21-system-message'>full</p>";
 		        		  echo "<p class='a21-system-message'>total for cur task & time=".$cnt."</p>";
 */
 		        		  // echo "<br>";
@@ -2521,7 +2519,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		  $i = 1;
 		        		  foreach ($arr_vols_cur_task as $member_id) {
 	  	        		      if(!empty($member_id) ) {
-	  	        		      	if($i == 1) echo "<p class='attendees'>DuGoodrs: ";
+	  	        		      	if($i == 1) echo "<p class='attendees'>Attendees: ";
 	  	        		      	$member_name .= "<p class='a21-system-message'>id ".$member_id."-".bp_core_get_username($member_id)."</p>";
 								$member_link = bp_core_get_userlink($member_id,false,true);	
 								$member_avatar = bp_core_fetch_avatar( array('item_id'=>$member_id, 'width'=>"30",'html'=>true));
@@ -2573,9 +2571,9 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		?>
 
 		
-	<!--	
+		
 		<p class="a21-system-box">Additional custom fields is still under development. Coming soon. Now you can only add or edit the image</p>
--->
+
 
 		<?php echo $event_meta; ?>
 
@@ -2607,7 +2605,7 @@ function bp_group_calendar_widget_create_event( $date ) {
 
 	?>
 	<div class="bp-widget">
-		<h4><?php _e( 'Create Event Callout', 'groupcalendar' ); ?></h4>
+		<h4><?php _e( 'Create Event', 'groupcalendar' ); ?></h4>
 
 		<form action="<?php echo $url; ?>" name="add-event-form" id="add-event-form" class="standard-form" method="post"
 		      enctype="multipart/form-data">
@@ -2704,19 +2702,19 @@ function bp_group_calendar_widget_create_event( $date ) {
 			            <td class="a21_dinam_coll">
 			                <input type="text" name="new_event_tasks[0][task]" placeholder="Eg. Title task 1"> </td>
 			            <td class="a21_dinam_coll vol_cnt">
-			                <input type="text" name="new_event_tasks[0][time_1]" placeholder="Eg. 5">
+			                <input type="text" name="new_event_tasks[0][time_1]" placeholder="2">
 			            </td>
 			            <td class="a21_dinam_coll vol_cnt">
-			                <input type="text" name="new_event_tasks[0][time_2]" placeholder="Eg. 3">
+			                <input type="text" name="new_event_tasks[0][time_2]" placeholder="2">
 			            </td>
 			        </tr>
 			        <tr class="a21_dinam_row">
 			            <td class="a21_dinam_coll">
 			                <input type="text" name="new_event_tasks[1][task]" placeholder="Eg. Title task 2"> </td>
 			            <td class="a21_dinam_coll vol_cnt">
-			                <input type="text" name="new_event_tasks[1][time_1]" placeholder="Eg. 2"> </td>
+			                <input type="text" name="new_event_tasks[1][time_1]" placeholder="2"> </td>
 			            <td class="a21_dinam_coll vol_cnt">
-			                <input type="text" name="new_event_tasks[1][time_2]" placeholder="Eg. 6"> </td>
+			                <input type="text" name="new_event_tasks[1][time_2]" placeholder="2"> </td>
 			        </tr>
 			    </tbody>
 			</table>
@@ -2732,7 +2730,7 @@ function bp_group_calendar_widget_create_event( $date ) {
 				</div>
 			</div>
 			<br>
-			<label for="thank_you"><?php _e( 'Event Completion Thank-you Message (*this will appear on timeline when finished)', 'groupcalendar' ); ?></label>
+			<label for="thank_you"><?php _e( 'Event Completion Thank-you Message', 'groupcalendar' ); ?></label>
 			<!-- <input name="thank_you" id="thank_you" value="" type="text"> -->
 			<textarea name="thank_you" id="thank_you" cols="30" rows="10"></textarea>
 			<?php /**** a21 ******/?>
@@ -2742,7 +2740,7 @@ function bp_group_calendar_widget_create_event( $date ) {
 			<input name="group-id" id="group-id" value="<?php echo $bp->groups->current_group->id; ?>" type="hidden">
 			<?php wp_nonce_field( 'bp_group_calendar' ); ?>
 
-			<p><input value="<?php _e( 'Create Event Callout', 'groupcalendar' ); ?> &raquo;" id="save" name="save"
+			<p><input value="<?php _e( 'Create Event', 'groupcalendar' ); ?> &raquo;" id="save" name="save"
 			          type="submit"></p>
 
 		</form>
@@ -3191,7 +3189,7 @@ class BP_Group_Calendar_Widget_Single extends WP_Widget {
 		} else {
 			?>
 			<div class="widget-error">
-				<?php _e( 'There are no upcoming event callout for this group.', 'groupcalendar' ) ?>
+				<?php _e( 'There are no upcoming event callouts for this group.', 'groupcalendar' ) ?>
 			</div>
 		<?php } ?>
 
@@ -3247,7 +3245,7 @@ class BP_Group_Calendar_Widget_User_Groups extends WP_Widget {
 	function BP_Group_Calendar_Widget_User_Groups() {
 		$widget_ops = array(
 			'classname'   => 'bp_group_calendar_user_groups',
-			'description' => __( 'Displays upcoming group event callout for a logged in user\'s groups.', 'groupcalendar' )
+			'description' => __( 'Displays upcoming group event callouts for a logged in user\'s groups.', 'groupcalendar' )
 		);
 		parent::__construct( 'bp_group_calendar_user_groups', __( 'User\'s Group Events', 'groupcalendar' ), $widget_ops );
 	}
