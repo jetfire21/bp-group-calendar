@@ -137,7 +137,7 @@ function as21_bp_group_calendar_event_add_action_message( $user_id, $event_id, $
 
 
 
-add_action("a21_bgc_message_thankyou","a21_bgc_message_thankyou");
+// add_action("a21_bgc_message_thankyou","a21_bgc_message_thankyou");
 
 function a21_bgc_message_thankyou(){
 
@@ -165,6 +165,7 @@ function a21_bgc_message_thankyou(){
 			// echo $i."- ".$event->event_title." ".$event->event_time; echo "<br>";
 			// $get_tasks_by_event_id = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id = %d AND ids_vols REGEXP
 			// 	'^2,|,2,|,2$|^2:|:2:|:2$|^2$'|:2,|,2: ", (int)$event->id ) );
+			// get all events where user was volunteer and date expired
 			$get_tasks_by_event_id = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id = %d AND ids_vols REGEXP
 				'^{$user_id_isnotlogin},|,{$user_id_isnotlogin},|,{$user_id_isnotlogin}$|^{$user_id_isnotlogin}:|:{$user_id_isnotlogin}:|:{$user_id_isnotlogin}$|^{$user_id_isnotlogin}$|:{$user_id_isnotlogin},|,{$user_id_isnotlogin}:' LIMIT 1", (int)$event->id ) );
 			// deb_last_query();
@@ -214,14 +215,16 @@ function a21_bgc_message_thankyou(){
 			              	  <?php if($group->name):?> 
 			              	  	 <div id="alex_gr_name_select"><?php echo $group->name;?></div>
 			              	  <?php endif;?>
-<!-- 			              	  <?php if($group->id):?> <div id="alex_gr_id_select"><?php echo $group->id;?></div><?php endif;?>
+
+<!-- 			              <?php if($group->id):?> <div id="alex_gr_id_select"><?php echo $group->id;?></div><?php endif;?>
 			              	  <span class="alex_item_id"><?php echo $field->ID;?></span>
 			                  <a class="btn btn-primary" href="javascript:void(0);" ><i class="fa fa-pencil fa fa-white"></i></a>
 			                  <a class="btn btn-bricky" href="javascript:void(0);" ><i class="fa fa-trash fa fa-white"></i></a>
 			                  <a href="#" class="btn btn-info">
 			                      Read More <i class="fa fa-arrow-circle-right"></i>
 			                  </a>
- -->			              </div>
+ -->			    
+ 				          </div>
 			          </div>
 			      </li>
 			<?php
@@ -229,6 +232,89 @@ function a21_bgc_message_thankyou(){
 			// echo "<br>";
 			$i++;
 		}
+	}
+
+}
+
+add_action("a21_bgc_message_thankyou","a21_bgc_message_thankyou_in_timeline");
+
+function a21_bgc_message_thankyou_in_timeline(){
+
+	global $wpdb,$bp;
+	$user_id_isnotlogin = $bp->displayed_user->id;
+
+	// echo "<h3>TESTING a21_bgc_output_thankyou <br>today:".date( 'Y-m-d H:i:s' )."</h3>";
+	// event_time >= '" . date( 'Y-m-d H:i:s' )
+	$events = $wpdb->get_results( $wpdb->prepare(
+		"SELECT * 
+		FROM {$wpdb->prefix}bp_groups_calendars
+		WHERE event_time <= %s
+		ORDER BY id ASC",
+		date( 'Y-m-d H:i:s' )
+	) );
+	// alex_debug(1,1,"",$events);
+
+	$i = 1;
+	$event_to_timeline = array();
+
+	if( !empty($events) ){
+
+		foreach ($events as $event) {
+
+			// echo $i."- ".$event->event_title." ".$event->event_time; echo "<br>";
+			// $get_tasks_by_event_id = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id = %d AND ids_vols REGEXP
+			// 	'^2,|,2,|,2$|^2:|:2:|:2$|^2$'|:2,|,2: ", (int)$event->id ) );
+			// get all events where user was volunteer and date expired
+			$get_tasks_by_event_id = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id = %d AND ids_vols REGEXP
+				'^{$user_id_isnotlogin},|,{$user_id_isnotlogin},|,{$user_id_isnotlogin}$|^{$user_id_isnotlogin}:|:{$user_id_isnotlogin}:|:{$user_id_isnotlogin}$|^{$user_id_isnotlogin}$|:{$user_id_isnotlogin},|,{$user_id_isnotlogin}:' LIMIT 1", (int)$event->id ) );
+			// deb_last_query();
+			// alex_debug(0,1,"get_tasks_by_event_id",$get_tasks_by_event_id);
+
+			if( !empty($get_tasks_by_event_id) ) {
+
+				// $event_time = bgc_date_display( $event->event_time, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) );
+				if( empty($event->thank_you )) return false;
+
+				$get_event_image = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM " . $wpdb->base_prefix . "bp_groups_groupmeta
+            	WHERE group_id=%d AND meta_key=%s LIMIT 1", (int)$event->id, 'a21_bgc_event_image') );
+
+				$event_time = strtotime($event->event_time);
+				$event_time = date("d M Y",$event_time);
+				$group = groups_get_group(array( 'group_id' => $event->group_id ));
+				$group_permalink =  'http://'.$_SERVER['HTTP_HOST'] . '/' . bp_get_groups_root_slug() . '/' . $group->slug . '/';
+				$avatar_options = array ( 'item_id' => $group->id, 'object' => 'group', 'type' => 'full', 'avatar_dir' => 'group-avatars', 'alt' => 'Group avatar', 'css_id' => 1234, 'class' => 'avatar', 'width' => 50, 'height' => 50, 'html' => false );
+				$gr_avatar = bp_core_fetch_avatar($avatar_options);
+
+				$class="purple";
+				$alex_tl_grp_id = "99999";
+				// if in wp_posts not exsist current id event then it insert in table
+
+				$is_cur_thankyou = $wpdb->get_var($wpdb->prepare("SELECT guid FROM {$wpdb->posts} WHERE guid=%d AND post_type=%s",$event->id,'alex_timeline'));
+				// deb_last_query();
+				// var_dump($is_cur_thankyou[0]);
+
+				if( empty($is_cur_thankyou[0])) {
+					echo "exist ".$is_cur_thankyou[0];
+					$last_post_id = $wpdb->get_var( "SELECT MAX(`ID`) FROM {$wpdb->posts}");
+					/*
+					$wpdb->insert(
+						$wpdb->posts,
+						array( 'post_date'=>$event->event_time ,'ID' => $last_post_id+1, 'post_title' => $event->event_title, 'post_name' => $class , 'post_content'=> $event->thank_you, 'post_excerpt'=>$event_time, 'post_type' => 'alex_timeline', 'post_parent'=> $member_id, 'menu_order'=>$alex_tl_grp_id,'guid'=>$event->id),
+						array( '%s','%d','%s','%s','%s','%s','%s','%d','%d','%d' )
+					);
+					*/
+					$wpdb->insert(
+						$wpdb->posts,
+						array( 'post_date'=>$event->event_time ,'ID' => $last_post_id+1, 'post_type' => 'alex_timeline', 'post_parent'=> $user_id_isnotlogin,'guid'=>$event->id),
+						array( '%s','%d','%s','%d','%d')
+					);
+					// deb_last_query();
+				}
+			}
+			// echo "<br>";
+			$i++;
+		}
+		// exit;
 	}
 
 }
@@ -2199,7 +2285,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 			<li><a href="http://twitter.com/share?url=<?php echo $event_full_link;?>&text=<?php echo stripslashes( $event->event_title ); ?>&via=dugoodr" title="Share this post on Twitter" target="_blank" class="twitter">Twitter</a></li>
 			<!-- https://www.linkedin.com/shareArticle?mini=true&url=http%3A//dugoodr2.dev/causes/ottawa-mission/callout/new-event-3x3-19-april--ottawa-mission-s4/&title=dfsdfdf&summary=&source= -->
 			<li><a href="http://www.linkedin.com/shareArticle?mini=true&url=<?php echo $event_full_link;?>&title=<?php echo stripslashes( $event->event_title ); ?>" title="Share this post on LinkedIn" target="_blank" class="linkedin">LinkedIn</a></li>
-			<li><a href="http://www.pinterest.com/pin/create/button/?url=<?php if($event_image) echo $event_image;?>&media=<?php if($event_image) echo $event_image;?>>&description=<?php echo stripslashes( $event->event_title ); ?>" target="_blank" class="pinterest" data-pin-do='buttonPin' data-pin-config='above'>Pinterest</a></li>
+			<li><a href="http://www.pinterest.com/pin/create/button/?url=<?php if($event_image) echo $event_image;?>&media=<?php if($event_image) echo $event_image;?>&description=<?php echo stripslashes( $event->event_title ); ?>" target="_blank" class="pinterest" data-pin-do='buttonPin' data-pin-config='above'>Pinterest</a></li>
 			<li><a href="mailto:?subject=<?php echo stripslashes( $event->event_title ); ?>&amp;body=<?php echo $event_full_link;?>" title="Share this with a friend!" class="email">Email</a></li>
 			</ul>
 		</div>
