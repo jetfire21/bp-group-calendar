@@ -175,13 +175,15 @@ table.calendar td.pad:hover {
 
 /* ******* PAGE CALENDAR ********* */
 
+#a21_bgc_tasks_shifts{margin:5px 0 !important;}
+
 #a21_bgc_tasks_shifts tr input{
     border: 0;
     margin: 0;
     width: 100% !important;
 }
 #a21_bgc_tasks_shifts button{ display: block; }
-#a21_bgc_tasks_shifts .avatar { margin-right: 5px; }
+#a21_bgc_tasks_shifts .avatar { margin: 0 5px 5px 0; }
 #a21_bgc_add_new_row, #a21_bgc_add_new_column{display: table;}
 #a21_bgc_add_new_row, #a21_bgc_add_new_column,#a21_bgc_del_row, #a21_bgc_del_column{cursor: pointer;}
 #add-event-form #total-volunteers{ width: 70px;  }
@@ -210,6 +212,30 @@ table.calendar-view {margin:0;}
 .events-list .link_title_edit { display: block; margin:0; }
 /*.events-list .event_title { display: block; }*/
 
+/*@media print{.print{ display: none; } body{ background: #000; }}*/
+
+#show-signup-report-modal .for-printer{ margin-top:20px !important; }
+#show-signup-report-modal {
+    padding: 20px;
+    background: #fff;
+    width: 100%;
+    margin:0 auto;
+}
+#show-signup-report-modal .print{
+    float: right;
+    padding:0 30px 0 10px;
+    //width: 200px;
+    //margin-top: 6px;
+     width: 22%;
+     text-align: right;
+}
+#show-signup-report-modal .events-title{float: left; line-height: 1; width: 78%;}
+#show-signup-report-modal .print img{ height: 32px;  cursor: pointer; vertical-align: bottom;}
+#show-signup-report-modal .member_info { line-height: 1.3; width: 85%; float:left; display: block; padding-left: 5px; }
+#show-signup-report-modal .a21_dinam_coll .wrap_member{ float: left;clear:left; width: 15%;}
+
+
+/*#show-signup-report-modal .for-printer{margin-top:20px!important}#show-signup-report-modal{padding:20px;background:#fff;width:100%;margin:0 auto}#show-signup-report-modal .print{float:right;padding:0 30px 0 10px;width:22%;text-align:right}#show-signup-report-modal .events-title{float:left;line-height:1;width:78%}#show-signup-report-modal .print img{height:32px;cursor:pointer;vertical-align:bottom}#show-signup-report-modal .member_info{line-height:1.3;width:85%;float:left;display:block;padding-left:5px}#show-signup-report-modal .a21_dinam_coll .wrap_member{float:left;clear:left;width:15%}*/
 /* ******* PAGE CALENDAR ********* */
 
 /* ******* SOCIAL ********* */
