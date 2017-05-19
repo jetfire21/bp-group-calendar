@@ -2217,8 +2217,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		</h5>
 		<div class="bgc-event-details-left">
 			<h5 class="events-title"><?php echo stripslashes( $event->event_title ); ?></h5>
-			<h6 class="event-label"><?php _e( 'Date/Time:', 'groupcalendar' ); ?></h6>
-			<?php echo $event_time; ?>
+			<h6 class="event-label"><?php _e( 'Date/Time:', 'groupcalendar' ); ?></h6><?php echo $event_time; ?>
 			<span
 				class="activity"><?php echo bgc_date_display( $event->event_time, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) ); ?></span>
 
@@ -2235,12 +2234,12 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 
 				<?php echo stripslashes( $event->event_location ); ?>
 
-				<?php if ( $event->event_map ) : ?>
-					<span class="event-map">
-    	    <a href="<?php echo $map_url; ?>" target="_blank"
-	           title="<?php _e( 'View Google Map of Event Location', 'groupcalendar' ); ?>"><?php _e( 'Map', 'groupcalendar' ); ?> &raquo;</a>
-    	  </span>
-				<?php endif; ?>
+			<?php if ( $event->event_map ) : ?>
+			<span class="event-map">
+			<a href="<?php echo $map_url; ?>" target="_blank"
+			title="<?php _e( 'View Google Map of Event Location', 'groupcalendar' ); ?>"><?php _e( 'Map', 'groupcalendar' ); ?> &raquo;</a>
+			</span>
+			<?php endif; ?>
 			</div>
 		<?php endif; ?>
 
@@ -2274,7 +2273,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		if($event_image) {?> 
 			<img class="" src="<?php echo $event_image;?>" alt="">
 		<?php }
-		$event_full_link = "http://".$_SERVER['HTTP_HOST']."/".$_SERVER['REQUEST_URI'];
+		$event_full_link = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 ?>
 		<div class="share"
 			<h4>Helping recruit Volunteers? If so, please share link:</h4>
@@ -2352,8 +2351,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		$need = " Needed";
 		if( !empty($event_tasks)):?>
 
-		    <h6 class="event-label">Total DuGoodrs Needed:</h6> 
-		    <?php if( !empty($event->total_vols) ) echo $event->total_vols;?>
+		     <?php if( !empty($event->total_vols) ) { ?> <h6 class="event-label">Total DuGoodrs Needed:</h6> <?php echo $event->total_vols; } ?>
 		    <!-- <h6 class="event-label">Thank-you Message:</h6>  -->
 		    <!-- <p class='a21-system-message'>for testing</p> -->
 		    <?php //if( !empty($event->thank_you) ) echo stripslashes($event->thank_you); ?>
@@ -2388,6 +2386,85 @@ function bp_group_calendar_widget_event_display( $event_id ) {
  */
 ?>
 			<?php /* **** as21 parse ids_vols & count vols - output **** */ ?>
+
+
+
+			<?php /* **** as21 for to print content of event details **** */ ?>
+
+			<span class="event-map" id="show-signup-report">
+			<!-- <a href="#"title="Get Signup Report"> Get Signup Report &raquo;</a> -->
+			<a href="/" title="Get Signup Report"> Get Signup Report &raquo;</a>
+			<!-- <button> Get Signup Report &raquo;</button> -->
+			</span>
+			<div id="show-signup-report-modal" class="white-popup mfp-hide">
+					<h5 class="events-title"><?php echo stripslashes( $event->event_title ); ?></h5>
+					<h6 class="event-label"><?php _e( 'Date/Time:', 'groupcalendar' ); ?></h6><?php echo $event_time; ?>
+					 <?php if( !empty($event->total_vols) ) { ?> <h6 class="event-label">Total Volunteers Requested:</h6> <?php echo $event->total_vols; } ?>
+					Url Link to event:	<a href="<?php echo $event_full_link; ?>"><?php echo $event_full_link; ?></a>
+					<div class="print">PRINT PAGE <img src="<?php echo get_stylesheet_directory_uri();?>/images/print.png" alt=""></div>
+			</div>
+			<script>
+			jQuery( document ).ready(function() {
+		    jQuery('#show-signup-report').magnificPopup({
+		        items: {
+		            src: '#show-signup-report-modal',
+		            type: 'inline',
+		            focus: '.username'
+		        },
+		        preloader: false,
+		        callbacks: {
+				    open: function() {
+				    	console.log("open---");
+				    	// jQuery("#show-signup-report-modal").show();
+				    	// var orig = jQuery("body").html();
+				    	// console.log("open===="+orig);
+				    },
+				    close: function() {
+				    	console.log("close---");
+				    	// console.log("close===="+orig);
+				    }
+				}
+		    });
+
+		    /* **** as21 prints the contents of the current window**** */
+		    jQuery(".print img").click(function (){
+
+		    	var styles = "<style>@media print{.print{ display: none; } body{ background: #000;} .mfp-close{display:none;} }</style>";
+				// var printContents = document.getElementById("show-signup-report-modal").innerHTML;
+				var printContents = jQuery("#show-signup-report-modal").html()+styles;
+				console.log(printContents);
+				// way 1 
+		    	w=window.open();
+				w.document.write(printContents);
+				w.print();
+				w.close();
+
+				// way2
+				/*
+				var originalContents = document.body.innerHTML;
+				document.body.innerHTML = printContents;
+		    	window.print();
+				body.innerHTML = originalContents;
+				*/
+		    });
+		    /* **** as21 prints the contents of the current window**** */
+
+			// jQuery(document).on('click', '.mfp-wrap', function () {
+			jQuery(document).on('click', '.mfp-close', function () {
+				jQuery.magnificPopup.close();
+		  		// console.log( jQuery(this).closest("body") );
+				// console.log("mfp-close");
+				// jQuery(this).closest("body").find(".mfp-bg").remove();
+				// jQuery(".mfp-wrap").remove();
+				// jQuery("html").css({"overflow":"auto","margin-right":"0"});
+				// jQuery(".s-wrap").html(report);
+			});
+			});
+			</script>
+
+			<?php /* **** as21 for to print content of event details **** */ ?>
+
+
 
 			<table id="a21_bgc_tasks_shifts" data-event-id="<?php echo $event_id;?>" style="margin-bottom: 5px;">
 
@@ -2658,12 +2735,10 @@ function bp_group_calendar_widget_create_event( $date ) {
 
 			<label for="event-loc"><?php _e( 'Location', 'groupcalendar' ); ?></label>
 			<input name="event-loc" id="event-loc" value="" type="text">
-<!--
 			<label for="event-map"><?php _e( 'Show Map Link?', 'groupcalendar' ); ?>
 				<input name="event-map" id="event-map" value="1" type="checkbox" checked="checked"/>
 				<small><?php _e( '(Note: Location must be an address)', 'groupcalendar' ); ?></small>
 			</label>
--->
 
 			
 			<?php /**** a21 ******/?>
