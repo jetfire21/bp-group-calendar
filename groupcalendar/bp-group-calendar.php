@@ -2534,7 +2534,7 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 			<?php
 			/* **** as21  for EDIT EVENT **** */
 
-			$event_tasks = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id='{$event_id}'");
+			$event_tasks = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_tasks WHERE event_id='{$event_id}' ORDER BY id");
 			$event_times = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bp_groups_bgc_time WHERE event_id='{$event_id}'");
 
 			/* **** as21 parse ids_vols & count vols**** */
@@ -2580,6 +2580,7 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 			/* **** as21 parse ids_vols & count vols**** */
 
 			?>
+			<?php if( !empty( $event_tasks[0]->task_title) ): // show tasks table if it isn't empty ?>
 			<table id="a21_bgc_tasks_shifts" data-event-id="<?php echo $event_id;?>" style="margin-bottom: 5px;">
 
 				<tr class="title_columns">
@@ -2592,7 +2593,7 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 					<?php endforeach;?>
 				</tr>
 
-				<?php foreach ($event_tasks as $k => $task):?>
+	        	<?php foreach ($event_tasks as $k => $task): if( !empty ($task->task_title) ): // show item task if cur task is not empty ?>
 
 					<tr class="a21_dinam_row" data-task_id="<?php echo $task->id;?>">
 						<td class="a21_dinam_coll"> 								
@@ -2608,8 +2609,9 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 								<input type="text" name="new_event_tasks[<?php echo $task->id;?>][<?php echo $k2;?>]" value="<?php echo $cnt;?>" /></td>
 						<?php endforeach;?>
 					</tr>
-				<?php endforeach;?>
+		        <?php  endif; endforeach;?>
 			</table>
+			<?php endif;?>
 			<?php if( empty($event_tasks)):?>
 			<div class="wrap_btns_for_event_tasks">
 				<div class="d_btn_left">

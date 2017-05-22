@@ -225,12 +225,32 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 			</span>
 			<div id="show-signup-report-modal" class="white-popup mfp-hide">
 					<h5 class="events-title"><?php echo stripslashes( $event->event_title ); ?></h5>
-					<div class="print">PRINT PAGE <img src="<?php echo get_stylesheet_directory_uri();?>/images/print.png" alt=""></div>
+					<div class="print"><span>PRINT PAGE</span> <img src="<?php echo get_stylesheet_directory_uri();?>/images/print.png" alt=""></div>
 					<div class="clearfix"></div>
-					<h6 class="event-label"><?php _e( 'Date/Time:', 'groupcalendar' ); ?></h6><?php echo $event_time; ?>
-					 <?php if( !empty($event->total_vols) ) { ?> <h6 class="event-label">Total Volunteers Requested:</h6> <?php echo $event->total_vols; } ?>
-					<h6 class="event-label">Url Link to event:</h6>	<a href="<?php echo $event_full_link; ?>"><?php echo $event_full_link; ?></a>
+					<!-- <h6 class="event-label"><?php _e( 'Date/Time:', 'groupcalendar' ); ?></h6><?php echo $event_time; ?> -->
+					<span class="print_row"><?php _e( 'Date/Time: ', 'groupcalendar' ); ?> <?php echo $event_time; ?></span>
+					 <?php if( !empty($event->total_vols) ) { ?> 
+					 <!-- <h6 class="event-label">Total Volunteers Requested:</h6>  -->
+					 <span class="print_row">Total Volunteers Requested: <?php echo $event->total_vols."</span>"; } ?>
+					<!-- <h6 class="event-label">Url Link to event:</h6>	<a href="<?php echo $event_full_link; ?>"><?php echo $event_full_link; ?></a> -->
+					<!-- <h6 class="event-label">Url Link to event:</h6>	<a href="<?php echo $event_full_link; ?>"><?php echo $event_full_link; ?></a> -->
+					<span class="print_row">Url Link to event: <a href="<?php echo $event_full_link; ?>"><?php echo $event_full_link; ?></a></span>
 
+			<?php if ( $event->event_description ) : ?>
+				<h6 class="event-label"><?php _e( 'Description:', 'groupcalendar' ); ?></h6>
+				<div class="event-description">
+					<?php echo stripslashes( $event->event_description ); ?>
+				</div>
+			<?php endif; ?>
+
+		<?php if ( $event->event_location ) : ?>
+			<!-- <h6 class="event-label"><?php _e( 'Location:', 'groupcalendar' ); ?></h6> -->
+			<?php _e( 'Location: ', 'groupcalendar' ); ?>
+			<!-- <div class="event-location">	<?php echo stripslashes( $event->event_location ); ?></div> -->
+			<?php echo stripslashes( $event->event_location ); ?>
+		<?php endif; ?>
+
+				<?php if( !empty( $event_tasks[0]->task_title) ): // show tasks table if it isn't empty ?>
 				<table id="a21_bgc_tasks_shifts" class="for-printer" data-event-id="<?php echo $event_id;?>">
 		        	<tr class="title_columns">
 		        	   <th class="a21_dinam_th_coll"> Task item </th>
@@ -239,7 +259,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 			        <?php endforeach;?>
 			       </tr>
 
-		        	<?php foreach ($event_tasks as $k => $task):?>
+	        	<?php foreach ($event_tasks as $k => $task): if( !empty ($task->task_title) ): // show item task if cur task is not empty ?>
 
 			        <tr class="a21_dinam_row" data-task_id="<?php echo $task->id;?>">
 			        	<td class="a21_dinam_coll"> <?php echo $task->task_title;?></td>
@@ -365,8 +385,9 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 			        		 </td>
 			      		 <?php endforeach;?>
 	    	        </tr>
-			        <?php endforeach;?>
+			        <?php endif; endforeach;?>
 				</table>
+				<?php endif;?>
 			</div>
 
 			<script>
@@ -395,11 +416,11 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		    /* **** as21 prints the contents of the current window**** */
 		    jQuery(".print img").click(function (){
 
-		    	var styles = "<style>@media print{.clearfix{clear:both;} .print{ display: none; } body{ background: #000;} .mfp-close{display:none;} table{border-collapse: collapse;} td,th{border:1px solid #bdbdbd;} #show-signup-report-modal .for-printer{margin-top:20px!important}#show-signup-report-modal{padding:0;background:#fff;width:100%;margin:0 auto}#show-signup-report-modal .print{float:right;padding:0 30px 0 10px;width:22%;text-align:right}#show-signup-report-modal .events-title{float:left;line-height:1;width:78%}#show-signup-report-modal .print img{height:32px;cursor:pointer;vertical-align:bottom}#show-signup-report-modal .member_info{line-height:1.3;width:85%;float:left;display:block;padding-left:5px}#show-signup-report-modal .a21_dinam_coll .wrap_member{float:left;clear:left;width:15%} }</style>";
+		    	var styles = "<style>@media print{.mfp-close,.print{display:none}.clearfix{clear:both}body{background:#000}table{border-collapse:collapse;width:100%}td,th{font-size:13px;border:1px solid #bdbdbd;padding:5px}#show-signup-report-modal .for-printer{margin-top:20px!important}span.print_row{padding-bottom:10px;display:block}#show-signup-report-modal{padding:0;background:#fff;width:100%;margin:0 auto}#show-signup-report-modal .events-title{margin:0 0 15px;padding:0;line-height:1;font-size:2em}#show-signup-report-modal .print{float:right;padding:0 30px 0 10px;width:22%;text-align:right}#show-signup-report-modal .print img{height:32px;cursor:pointer;vertical-align:bottom}#show-signup-report-modal .member_info{line-height:1.3;width:80%;float:left;display:block;padding-left:5px}#show-signup-report-modal .a21_dinam_coll .wrap_member{float:left;clear:left;width:15%;margin-bottom:5px}}</style>";
 				// var printContents = document.getElementById("show-signup-report-modal").innerHTML;
-				var printContents = styles+jQuery("#show-signup-report-modal").html();
-				printContents = '<div id="show-signup-report-modal">'+printContents+'</div>';
-				console.log(printContents);
+				var printContents = jQuery("#show-signup-report-modal").html();
+				printContents = styles+'<div id="show-signup-report-modal">'+printContents+'</div>';
+				// console.log(printContents);
 				// way 1
 		    	w=window.open();
 				w.document.write(printContents);
@@ -428,10 +449,11 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 			});
 			});
 			</script>
-
+			
+			<?php // echo alex_debug(0,1,"",$event_tasks); ?>
 			<?php /* **** as21 for to print content of event details **** */ ?>
 
-
+			<?php if( !empty( $event_tasks[0]->task_title) ): // show tasks table if it isn't empty ?>
 			<table id="a21_bgc_tasks_shifts" data-event-id="<?php echo $event_id;?>">
 	        	<tr class="title_columns">
 	        	   <th class="a21_dinam_th_coll"> Task item </th>
@@ -440,7 +462,7 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        <?php endforeach;?>
 		       </tr>
 
-	        	<?php foreach ($event_tasks as $k => $task):?>
+	        	<?php foreach ($event_tasks as $k => $task): if( !empty ($task->task_title) ): // show item task if cur task is not empty ?>
 
 		        <tr class="a21_dinam_row" data-task_id="<?php echo $task->id;?>">
 		        	<td class="a21_dinam_coll"> <?php echo $task->task_title;?></td>
@@ -577,8 +599,9 @@ function bp_group_calendar_widget_event_display( $event_id ) {
 		        		 </td>
 		      		 <?php endforeach;?>
     	        </tr>
-		        <?php endforeach;?>
+		        <?php  endif; endforeach;?>
 			</table>
+			<?php endif;?>
 
 			<?php /* **** as21 parse ids_vols & count vols - output **** */ ?>
 
