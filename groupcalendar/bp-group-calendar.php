@@ -1129,8 +1129,16 @@ function bp_group_calendar_event_save() {
 					$query = $wpdb->prepare( "UPDATE " . $wpdb->base_prefix . "bp_groups_groupmeta
 				                	SET meta_value=%s WHERE group_id=%d AND meta_key=%s LIMIT 1
 				                	",$movefile['url'],(int) $_POST['event-id'], 'a21_bgc_event_image' );
-					$wpdb->query( $query );
+					$update_image = $wpdb->query( $query );
+					// var_dump($update_image);
 					// deb_last_query();
+					if( (bool)$update_image === false) {
+						$query = $wpdb->prepare( "INSERT INTO " . $wpdb->base_prefix . "bp_groups_groupmeta
+					                	( group_id,meta_key,meta_value)
+					                	VALUES ( %d,%s, %s )", (int) $_POST['event-id'], 'a21_bgc_event_image',$movefile['url'] );
+						$wpdb->query( $query );
+						// deb_last_query();
+					}
 					// exit;
 
 				} else {
@@ -2633,7 +2641,7 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 			<!-- <input name="thank_you" id="thank_you" value="" type="text"> -->
 			<textarea name="thank_you" id="thank_you" cols="30" rows="10"><?php echo stripslashes($event->thank_you);?></textarea>
 			
-			<p class="a21-system-box">Additional custom fields is still under development. Coming soon. Now you can only add or edit the image</p>
+			<!-- <p class="a21-system-box">Additional custom fields is still under development. Coming soon. Now you can only add or edit the image</p> -->
 
 			<?php if ( $event_id ) : ?>
 				<input name="event-id" id="event-id" value="<?php echo $event_id; ?>" type="hidden">
