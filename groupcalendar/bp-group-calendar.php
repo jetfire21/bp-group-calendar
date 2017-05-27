@@ -309,6 +309,25 @@ function a21_bgc_message_thankyou_in_timeline(){
 					// deb_last_query();
 				}
 			}
+
+			/* **** will add thank_you message on timeline event creator,even if he isn't sign up to own event ***** */
+
+			// echo " event_id ".$event->event_title."<br>";
+			$is_creator_event = $wpdb->get_var( $wpdb->prepare(	"SELECT ID FROM {$wpdb->posts} WHERE post_parent = %d  AND post_type = %s AND guid=%d",
+			$event->user_id, "alex_timeline", $event->id ) );
+			// var_dump($is_creator_event);
+			// deb_last_query();
+			if( is_null($is_creator_event) ):
+				$wpdb->insert(
+					$wpdb->posts,
+					array( 'post_date'=>$event->event_time ,'ID' => $last_post_id+1, 'post_type' => 'alex_timeline', 'post_parent'=> $user_id_isnotlogin,'guid'=>$event->id),
+					array( '%s','%d','%s','%d','%d')
+				);
+				// deb_last_query();
+			endif;
+
+			/* **** will add thank_you message on timeline event creator,even if he isn't sign up to own event ***** */
+				
 			// echo "<br>";
 			$i++;
 		}
