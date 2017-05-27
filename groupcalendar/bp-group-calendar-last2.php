@@ -271,7 +271,7 @@ function a21_bgc_message_thankyou_in_timeline(){
 			if( !empty($get_tasks_by_event_id) ) {
 
 				// $event_time = bgc_date_display( $event->event_time, get_option( 'date_format' ) . __( ' \a\t ', 'groupcalendar' ) . get_option( 'time_format' ) );
-				// if( empty($event->thank_you )) return false;
+				if( empty($event->thank_you )) return false;
 
 				$get_event_image = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM " . $wpdb->base_prefix . "bp_groups_groupmeta
             	WHERE group_id=%d AND meta_key=%s LIMIT 1", (int)$event->id, 'a21_bgc_event_image') );
@@ -287,14 +287,13 @@ function a21_bgc_message_thankyou_in_timeline(){
 				$alex_tl_grp_id = "99999";
 				// if in wp_posts not exsist current id event then it insert in table
 
-				// $is_cur_thankyou = $wpdb->get_var($wpdb->prepare("SELECT guid FROM {$wpdb->posts} WHERE guid=%d AND post_type=%s",$event->id,'alex_timeline'));
-				$is_cur_thankyou = $wpdb->get_var($wpdb->prepare("SELECT guid FROM {$wpdb->posts} WHERE guid=%d AND post_parent=%d AND post_type=%s",$event->id,$user_id_isnotlogin,'alex_timeline'));
+				$is_cur_thankyou = $wpdb->get_var($wpdb->prepare("SELECT guid FROM {$wpdb->posts} WHERE guid=%d AND post_type=%s",$event->id,'alex_timeline'));
 				// deb_last_query();
 				// var_dump($is_cur_thankyou[0]);
 
 				if( empty($is_cur_thankyou[0])) {
-					// echo "exist ".$is_cur_thankyou[0];
-					//$last_post_id = $wpdb->get_var( "SELECT MAX(`ID`) FROM {$wpdb->posts}");
+					echo "exist ".$is_cur_thankyou[0];
+					$last_post_id = $wpdb->get_var( "SELECT MAX(`ID`) FROM {$wpdb->posts}");
 					/*
 					$wpdb->insert(
 						$wpdb->posts,
@@ -304,8 +303,8 @@ function a21_bgc_message_thankyou_in_timeline(){
 					*/
 					$wpdb->insert(
 						$wpdb->posts,
-						array( 'post_date'=>$event->event_time , 'post_type' => 'alex_timeline', 'post_parent'=> $user_id_isnotlogin,'guid'=>$event->id),
-						array( '%s','%s','%d','%d')
+						array( 'post_date'=>$event->event_time ,'ID' => $last_post_id+1, 'post_type' => 'alex_timeline', 'post_parent'=> $user_id_isnotlogin,'guid'=>$event->id),
+						array( '%s','%d','%s','%d','%d')
 					);
 					// deb_last_query();
 				}
@@ -319,11 +318,12 @@ function a21_bgc_message_thankyou_in_timeline(){
 			// var_dump($is_creator_event);
 			// deb_last_query();
 			if( is_null($is_creator_event) ):
-				$wpdb->insert(
-					$wpdb->posts,
-					array( 'post_date'=>$event->event_time, 'post_type' => 'alex_timeline', 'post_parent'=> $user_id_isnotlogin,'guid'=>$event->id),
-					array( '%s','%s','%d','%d')
-				);
+				// $wpdb->insert(
+				// 	$wpdb->posts,
+				// 	array( 'post_date'=>$event->event_time ,'ID' => $last_post_id+1, 'post_type' => 'alex_timeline', 'post_parent'=> $user_id_isnotlogin,'guid'=>$event->id),
+				// 	array( '%s','%d','%s','%d','%d')
+				// );
+				// deb_last_query();
 			endif;
 
 			/* **** will add thank_you message on timeline event creator,even if he isn't sign up to own event ***** */
