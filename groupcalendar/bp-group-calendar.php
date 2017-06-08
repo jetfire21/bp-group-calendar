@@ -1176,6 +1176,18 @@ function bp_group_calendar_event_save() {
 
 		} else { //new event
 
+			$query = $wpdb->prepare(
+ 				"SELECT * FROM " . $wpdb->base_prefix . "bp_groups_calendars WHERE group_id='%d' AND user_id='%d' AND event_time='%s' AND event_title='%s' AND event_description='%s' AND event_location='%s'", $group_id, $current_user->ID, $event_date, $event_title, $event_description, $event_location
+ 			);
+ 
+ 			$res = $wpdb->query( $query );
+ 
+ 			if( $res != 0 )
+ 			{
+ 				bp_core_add_message( __( "Looks like you are creating a duplicate event!", 'groupcalendar' ), 'error' );
+ 				return;
+ 			}
+ 			
 			$event_slug = strtolower($event_title);
 			$event_slug = str_replace(" ", "-", $event_slug);
 
