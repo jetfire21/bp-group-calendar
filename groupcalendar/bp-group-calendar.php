@@ -1727,7 +1727,6 @@ function bp_group_calendar_create_event_url( $event_id, $edit = false ) {
 	if ( $edit ) {
 		$url .= "edit/";
 	}
-
 	return $url;
 
 }
@@ -2219,7 +2218,6 @@ function bp_group_calendar_widget_create_event( $date ) {
 			$default_date = date( 'Y-m-d', $timestamp );
 		}
 	}
-
 	$url = bp_get_group_permalink( $bp->groups->current_group ) . 'callout/';
 
 	?>
@@ -2369,7 +2367,6 @@ function bp_group_calendar_widget_create_event( $date ) {
 
 function bp_group_calendar_widget_edit_event( $event_id = false ) {
 	global $wpdb, $current_user, $bp, $bgc_locale;
-
 	$url = bp_get_group_permalink( $bp->groups->current_group ) . 'callout/';
 
 	$group_id = $bp->groups->current_group->id;
@@ -2390,7 +2387,9 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 	if ( $event_id ) { //load from DB
 
 		// $url .= 'event/' . $event_id . '/';
-		$url .= '/' . $event_id . '/';
+		// $url .= '/' . $event_id . '/';
+		/* **** as21 8 fixed double // causes/test-group-test/callout//8/ **** */
+		$url .=  $event_id . '/';
 
 		$event = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM " . $wpdb->base_prefix . "bp_groups_calendars WHERE group_id = %d AND id = %d", $group_id, $event_id ) );
 
