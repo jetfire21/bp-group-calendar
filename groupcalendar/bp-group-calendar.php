@@ -202,7 +202,7 @@ function a21_bgc_message_thankyou(){
 			              </div>
 			              <div class="content">
 			              	   <?php if( !empty($get_event_image) ) {
-			              	    echo "<a href='".$group_permalink."/callout/".$event->event_slug."' class='event_image' target='_blank'><img src='".$get_event_image."' /></a>";
+			              	    echo "<a href='".$group_permalink."/helpers/".$event->event_slug."' class='event_image' target='_blank'><img src='".$get_event_image."' /></a>";
 			              	    echo "<p>".stripslashes($event->thank_you)."</p>";
 			              	    }else echo stripslashes($event->thank_you);
 			              	    ?>
@@ -822,8 +822,8 @@ if ( class_exists( 'BP_Group_Extension' ) ) {
 		function bp_group_calendar_extension() {
 			global $bp;
 
-			$this->name            = __( 'Callout', 'groupcalendar' );
-			$this->slug            = 'callout';
+			$this->name            = __( 'Gather Helpers', 'groupcalendar' );
+			$this->slug            = 'helpers';
 			$this->enable_nav_item = isset( $bp->groups->current_group->user_has_access ) ? $bp->groups->current_group->user_has_access : false;
 
 			//$this->create_step_position = 21;
@@ -1538,7 +1538,7 @@ function bp_group_calendar_url_parse() {
 
 	$calendar_url = $calendar_url_clean[0];
 
-	$calendar_url_sections = explode( "/callout/", $calendar_url );
+	$calendar_url_sections = explode( "/helpers/", $calendar_url );
 
 	$calendar_url = $calendar_url_sections[1];
 
@@ -1546,7 +1546,7 @@ function bp_group_calendar_url_parse() {
 
 	$calendar_url = rtrim( $calendar_url, "/" );
 
-	$base = $calendar_url_sections[0] . '/callout/';
+	$base = $calendar_url_sections[0] . '/helpers/';
 
 	$base = ltrim( $base, "/" );
 
@@ -1602,7 +1602,7 @@ function bp_group_calendar_event_url_parse() {
 
 	$url_clean    = explode( "?", $url );
 	$url          = $url_clean[0];
-	$url_sections = explode( "/callout/", $url );
+	$url_sections = explode( "/helpers/", $url );
 	$url          = isset( $url_sections[1] ) ? $url_sections[1] : '';
 	$url          = ltrim( $url, "/" );
 	$slug          = rtrim( $url, "/" ); // a21
@@ -1619,7 +1619,7 @@ function bp_group_calendar_event_url_parse() {
 	// echo $slug;
 	// echo "<br>";
 	// if ( strpos( $full_url,"/huddle/event/" ) !== false && strpos( $full_url,"/edit/" ) === false && strpos( $full_url,"delete/" ) === false) {
-	if ( !preg_match("#\/callout\/$#i", $full_url) && strpos( $full_url,"/edit/" ) === false && strpos( $full_url,"delete/" ) === false) {
+	if ( !preg_match("#\/helpers\/$#i", $full_url) && strpos( $full_url,"/edit/" ) === false && strpos( $full_url,"delete/" ) === false) {
 		// echo "======================";
 		global $wpdb;
 		$url = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}bp_groups_calendars WHERE event_slug='%s'",sanitize_text_field($slug)));
@@ -1727,9 +1727,9 @@ function bp_group_calendar_create_event_url( $event_id, $edit = false ) {
 		$event_title = str_replace(" ", "-", $event_title);
 		// echo "<br><br>bp_group_calendar_create_event_url<br>";
 		// $url .= 'huddle/event/' . $event_title . '/';
-		$url .= 'callout/' . $event_title . '/';
+		$url .= 'helpers/' . $event_title . '/';
 	}else{
-		$url .= 'callout/' . $event_id . '/';
+		$url .= 'helpers/' . $event_id . '/';
 	}
 	// exit;
 	/***** a21 ******/
@@ -1871,7 +1871,7 @@ function bp_group_calendar_notification_settings() {
 //enqeue js on product settings screen
 function bp_group_calendar_js() {
 
-	if ( ! is_admin() && strpos( $_SERVER['REQUEST_URI'], '/callout/' ) !== false ) {
+	if ( ! is_admin() && strpos( $_SERVER['REQUEST_URI'], '/helpers/' ) !== false ) {
 		global $bgc_locale;
 
 		wp_enqueue_style( 'groupcalendar-css', plugins_url( '/bp-group-calendar/groupcalendar/group_calendar.css' ), false );
@@ -1887,7 +1887,7 @@ function bp_group_calendar_js() {
 
 function bp_group_calendar_js_output() {
 	//display css
-	if ( ! is_admin() && strpos( $_SERVER['REQUEST_URI'], '/callout/' ) !== false ) {
+	if ( ! is_admin() && strpos( $_SERVER['REQUEST_URI'], '/helpers/' ) !== false ) {
 		global $bgc_locale;
 		?>
 		<script type="text/javascript">
@@ -2051,7 +2051,7 @@ function bp_group_calendar_widget_day( $date ) {
 	$cal->week_start        = $bgc_locale['week_start'];
 	$first_day              = $cal->year . "-" . $cal->month . "-01";
 	$cal->highlighted_dates = bp_group_calendar_highlighted_events( $bp->groups->current_group->id, $first_day );
-	$url                    = bp_get_group_permalink( $bp->groups->current_group ) . 'callout';
+	$url                    = bp_get_group_permalink( $bp->groups->current_group ) . 'helpers';
 	$url                    = rawurldecode( $url );
 	$cal->formatted_link_to = $url . '/%Y/%m/%d/';
 	?>
@@ -2064,7 +2064,7 @@ function bp_group_calendar_widget_day( $date ) {
 					<?php print( $cal->output_calendar() ); ?>
 				</td>
 				<td class="cal-right">
-					<h5 class="events-title"><?php _e( "Callout Event Helpers For", 'groupcalendar' ); ?> <?php echo date_i18n( get_option( 'date_format' ), strtotime( $day ) ); ?>
+					<h5 class="events-title"><?php _e( "Request Event Helpers For", 'groupcalendar' ); ?> <?php echo date_i18n( get_option( 'date_format' ), strtotime( $day ) ); ?>
 						:</h5>
 					<?php bp_group_calendar_list_events( $bp->groups->current_group->id, 'day', $day, $calendar_capabilities ); ?>
 				</td>
@@ -2088,7 +2088,7 @@ function bp_group_calendar_widget_month( $date ) {
 	}
 
 	$cal->week_start        = $bgc_locale['week_start'];
-	$url                    = bp_get_group_permalink( $bp->groups->current_group ) . 'callout';
+	$url                    = bp_get_group_permalink( $bp->groups->current_group ) . 'helpers';
 	$url                    = rawurldecode( $url );
 	$cal->formatted_link_to = $url . '/%Y/%m/%d/';
 
@@ -2118,7 +2118,7 @@ function bp_group_calendar_widget_month( $date ) {
 					<?php print( $cal->output_calendar() ); ?>
 				</td>
 				<td class="cal-right">
-					<h5 class="events-title"><?php _e( 'Event Callouts For', 'groupcalendar' ); ?> <?php echo date_i18n( 'F Y', strtotime( $first_day ) ); ?>
+					<h5 class="events-title"><?php _e( 'Event Help Request For', 'groupcalendar' ); ?> <?php echo date_i18n( 'F Y', strtotime( $first_day ) ); ?>
 						:</h5>
 					<?php bp_group_calendar_list_events( $bp->groups->current_group->id, 'month', $first_day, $calendar_capabilities ); ?>
 				</td>
@@ -2137,7 +2137,7 @@ function bp_group_calendar_widget_year( $date ) {
 	$year  = $date['year'];
 	$month = 1;
 
-	$url = bp_get_group_permalink( $bp->groups->current_group ) . 'callout';
+	$url = bp_get_group_permalink( $bp->groups->current_group ) . 'helpers';
 	//first day of month for calulation previous and next years
 	$first_day     = $year . "-01-01";
 	$previous_year = $url . date( "/Y/", strtotime( "-1 year", strtotime( $first_day ) ) );
@@ -2230,11 +2230,11 @@ function bp_group_calendar_widget_create_event( $date ) {
 			$default_date = date( 'Y-m-d', $timestamp );
 		}
 	}
-	$url = bp_get_group_permalink( $bp->groups->current_group ) . 'callout/';
+	$url = bp_get_group_permalink( $bp->groups->current_group ) . 'helpers/';
 
 	?>
 	<div class="bp-widget">
-		<h4><?php _e( 'Create Event Callout', 'groupcalendar' ); ?></h4>
+		<h4><?php _e( 'Create Event Help Request', 'groupcalendar' ); ?></h4>
 
 		<form action="<?php echo $url; ?>" name="add-event-form" id="add-event-form" class="standard-form" method="post"
 		      enctype="multipart/form-data">
@@ -2285,9 +2285,11 @@ function bp_group_calendar_widget_create_event( $date ) {
 
 			<label for="event-loc"><?php _e( 'Location', 'groupcalendar' ); ?></label>
 			<input name="event-loc" id="event-loc" value="" type="text">
-			<label for="event-map"><?php _e( 'Show Map Link?', 'groupcalendar' ); ?>
+<!--		
+<label for="event-map"><?php _e( 'Show Map Link?', 'groupcalendar' ); ?>
 				<input name="event-map" id="event-map" value="1" type="checkbox" checked="checked"/>
 				<small><?php _e( '(Note: Location must be an address)', 'groupcalendar' ); ?></small>
+-->
 			</label>
 
 			
@@ -2367,7 +2369,7 @@ function bp_group_calendar_widget_create_event( $date ) {
 			<input name="group-id" id="group-id" value="<?php echo $bp->groups->current_group->id; ?>" type="hidden">
 			<?php wp_nonce_field( 'bp_group_calendar' ); ?>
 
-			<p><input value="<?php _e( 'Create Event Callout', 'groupcalendar' ); ?> &raquo;" id="save" name="save"
+			<p><input value="<?php _e( 'Create Event Help Request', 'groupcalendar' ); ?> &raquo;" id="save" name="save"
 			          type="submit"></p>
 
 		</form>
@@ -2379,7 +2381,7 @@ function bp_group_calendar_widget_create_event( $date ) {
 
 function bp_group_calendar_widget_edit_event( $event_id = false ) {
 	global $wpdb, $current_user, $bp, $bgc_locale;
-	$url = bp_get_group_permalink( $bp->groups->current_group ) . 'callout/';
+	$url = bp_get_group_permalink( $bp->groups->current_group ) . 'helpers/';
 
 	$group_id = $bp->groups->current_group->id;
 
@@ -2400,7 +2402,7 @@ function bp_group_calendar_widget_edit_event( $event_id = false ) {
 
 		// $url .= 'event/' . $event_id . '/';
 		// $url .= '/' . $event_id . '/';
-		/* **** as21 8 fixed double // causes/test-group-test/callout//8/ **** */
+		/* **** as21 8 fixed double // causes/test-group-test/helpers//8/ **** */
 		$url .=  $event_id . '/';
 
 		$event = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM " . $wpdb->base_prefix . "bp_groups_calendars WHERE group_id = %d AND id = %d", $group_id, $event_id ) );
@@ -2729,7 +2731,7 @@ class BP_Group_Calendar_Widget extends WP_Widget {
 				$class = ( $event->user_id == $current_user->ID ) ? ' class="my_event"' : '';
 				$events_list .= "\n<li" . $class . ">";
 				$group = groups_get_group( array( 'group_id' => $event->group_id ) );
-				$url   = bp_get_group_permalink( $group ) . 'callout/' . $event->id . '/';
+				$url   = bp_get_group_permalink( $group ) . 'helpers/' . $event->id . '/';
 				$events_list .= stripslashes( $event->name ) . '<br /><a href="' . $url . '" title="' . __( 'View Event', 'groupcalendar' ) . '">' . bgc_date_display( $event->event_time ) . ': ' . stripslashes( $event->event_title ) . '</a>';
 				$events_list .= "</li>";
 			}
@@ -2809,7 +2811,7 @@ class BP_Group_Calendar_Widget_Single extends WP_Widget {
 				$class = ( $event->user_id == $current_user->ID ) ? ' class="my_event"' : '';
 				$events_list .= "\n<li" . $class . ">";
 				$group = groups_get_group( array( 'group_id' => $event->group_id ) );
-				$url   = bp_get_group_permalink( $group ) . 'callout/' . $event->id . '/';
+				$url   = bp_get_group_permalink( $group ) . 'helpers/' . $event->id . '/';
 				$events_list .= stripslashes( $event->name ) . '<br /><a href="' . $url . '" title="' . __( 'View Event', 'groupcalendar' ) . '">' . bgc_date_display( $event->event_time ) . ': ' . stripslashes( $event->event_title ) . '</a>';
 				$events_list .= "</li>";
 			}
@@ -2819,7 +2821,7 @@ class BP_Group_Calendar_Widget_Single extends WP_Widget {
 		} else {
 			?>
 			<div class="widget-error">
-				<?php _e( 'There are no upcoming event callout for this group.', 'groupcalendar' ) ?>
+				<?php _e( 'There are no upcoming helper events for this group.', 'groupcalendar' ) ?>
 			</div>
 		<?php } ?>
 
@@ -2875,7 +2877,7 @@ class BP_Group_Calendar_Widget_User_Groups extends WP_Widget {
 	function BP_Group_Calendar_Widget_User_Groups() {
 		$widget_ops = array(
 			'classname'   => 'bp_group_calendar_user_groups',
-			'description' => __( 'Displays upcoming group event callout for a logged in user\'s groups.', 'groupcalendar' )
+			'description' => __( 'Displays upcoming group helper events for a logged in user\'s groups.', 'groupcalendar' )
 		);
 		parent::__construct( 'bp_group_calendar_user_groups', __( 'User\'s Group Events', 'groupcalendar' ), $widget_ops );
 	}
@@ -2916,7 +2918,7 @@ class BP_Group_Calendar_Widget_User_Groups extends WP_Widget {
 				$class = ( $event->user_id == $current_user->ID ) ? ' class="my_event"' : '';
 				$events_list .= "\n<li" . $class . ">";
 				$group = groups_get_group( array( 'group_id' => $event->group_id ) );
-				$url   = bp_get_group_permalink( $group ) . 'callout/' . $event->id . '/';
+				$url   = bp_get_group_permalink( $group ) . 'helpers/' . $event->id . '/';
 				$events_list .= stripslashes( $event->name ) . '<br /><a href="' . $url . '" title="' . __( 'View Event', 'groupcalendar' ) . '">' . bgc_date_display( $event->event_time ) . ': ' . stripslashes( $event->event_title ) . '</a>';
 				$events_list .= "</li>";
 			}
@@ -2926,7 +2928,7 @@ class BP_Group_Calendar_Widget_User_Groups extends WP_Widget {
 		} else {
 			?>
 			<div class="widget-error">
-				<?php _e( 'There are no upcoming event callouts for your groups.', 'groupcalendar' ) ?>
+				<?php _e( 'There are no upcoming helper events for your groups.', 'groupcalendar' ) ?>
 			</div>
 		<?php } ?>
 
