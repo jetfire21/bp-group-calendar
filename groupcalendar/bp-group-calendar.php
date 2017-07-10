@@ -822,7 +822,7 @@ if ( class_exists( 'BP_Group_Extension' ) ) {
 		function bp_group_calendar_extension() {
 			global $bp;
 
-			$this->name            = __( 'Gather Helpers', 'groupcalendar' );
+			$this->name            = __( 'Get Helpers', 'groupcalendar' );
 			$this->slug            = 'helpers';
 			$this->enable_nav_item = isset( $bp->groups->current_group->user_has_access ) ? $bp->groups->current_group->user_has_access : false;
 
@@ -2235,7 +2235,10 @@ function bp_group_calendar_widget_create_event( $date ) {
 	?>
 	<div class="bp-widget">
 		<h4><?php _e( 'Create Event Help Request', 'groupcalendar' ); ?></h4>
-
+		<?php _e( 'STEP 1: Add an event.  STEP 2: Get helpers.', 'groupcalendar' ); ?>
+</br>
+		<?php _e( 'This tool sends the event to Cause DuGoodrs and shares on social media.  People can then sign up for tasks and automatically get recognition on their timeline for participating.  Try it out!', 'groupcalendar' ); ?>
+</br>&nbsp;</br>
 		<form action="<?php echo $url; ?>" name="add-event-form" id="add-event-form" class="standard-form" method="post"
 		      enctype="multipart/form-data">
 			<label for="event-title"><?php _e( 'Title', 'groupcalendar' ); ?> *</label>
