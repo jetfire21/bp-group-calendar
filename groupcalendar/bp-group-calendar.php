@@ -822,7 +822,7 @@ if ( class_exists( 'BP_Group_Extension' ) ) {
 		function bp_group_calendar_extension() {
 			global $bp;
 
-			$this->name            = __( 'Get Helpers', 'groupcalendar' );
+			$this->name            = __( 'Shoutout', 'groupcalendar' );
 			$this->slug            = 'helpers';
 			$this->enable_nav_item = isset( $bp->groups->current_group->user_has_access ) ? $bp->groups->current_group->user_has_access : false;
 
@@ -1802,7 +1802,9 @@ function bp_group_calendar_settings() {
 	}
 
 	?>
-	<h4><?php _e( 'Group Calendar Settings', 'groupcalendar' ) ?></h4>
+	
+<!--
+<h4><?php _e( 'Group Calendar Settings', 'groupcalendar' ) ?></h4>
 	<label for="group-calendar-moderator-capabilities"><?php _e( 'Moderator Capabilities', 'groupcalendar' ) ?></label>
 
 	<select name="group-calendar-moderator-capabilities" id="group-calendar-moderator-capabilities">
@@ -1849,6 +1851,7 @@ function bp_group_calendar_settings() {
 	              type="radio"<?php echo ( $email == 'no' ) ? ' checked="checked"' : ''; ?> /> <?php _e( 'No', 'groupcalendar' ) ?>
 	</label><br/>
 	<hr/>
+-->
 	<?php
 }
 
@@ -1954,7 +1957,7 @@ function bp_group_calendar_list_events( $group_id, $range, $date = '', $calendar
 	if ( $range == 'all' ) {
 
 		$filter        = " WHERE group_id = $group_id";
-		$empty_message = __( 'There are no scheduled events', 'groupcalendar' );
+		$empty_message = __( 'There are no scheduled shoutouts', 'groupcalendar' );
 
 	} else if ( $range == 'month' ) {
 
@@ -1966,20 +1969,20 @@ function bp_group_calendar_list_events( $group_id, $range, $date = '', $calendar
 			$end_date   = date( 'Y-m-d H:i:s', strtotime( "+1 month", strtotime( $start_date ) ) );
 		}
 		$filter        = " WHERE group_id = $group_id AND event_time >= '$start_date' AND event_time < '$end_date'";
-		$empty_message = __( 'There are no events scheduled for this month', 'groupcalendar' );
+		$empty_message = __( 'There are no shoutouts scheduled for this month.  All you need to do is add one!', 'groupcalendar' );
 
 	} else if ( $range == 'day' ) {
 
 		$start_date    = date( 'Y-m-d H:i:s', strtotime( $date ) - ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) );
 		$end_date      = date( 'Y-m-d H:i:s', strtotime( date( 'Y-m-d', strtotime( $date ) ) . ' 23:59:59' ) - ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) );
 		$filter        = " WHERE group_id = $group_id AND event_time >= '$start_date' AND event_time <= '$end_date'";
-		$empty_message = __( 'There are no events scheduled for this day', 'groupcalendar' );
+		$empty_message = __( 'There are no shoutouts scheduled for this day', 'groupcalendar' );
 		$date_format   = get_option( 'time_format' );
 
 	} else if ( $range == 'upcoming' ) {
 
 		$filter        = " WHERE group_id = $group_id AND event_time >= '" . date( 'Y-m-d H:i:s' ) . "'";
-		$empty_message = __( 'There are no upcoming events', 'groupcalendar' );
+		$empty_message = __( 'There are no upcoming shoutouts', 'groupcalendar' );
 
 	} else if ( $range == 'mine' ) {
 
@@ -2064,7 +2067,7 @@ function bp_group_calendar_widget_day( $date ) {
 					<?php print( $cal->output_calendar() ); ?>
 				</td>
 				<td class="cal-right">
-					<h5 class="events-title"><?php _e( "Request Event Helpers For", 'groupcalendar' ); ?> <?php echo date_i18n( get_option( 'date_format' ), strtotime( $day ) ); ?>
+					<h5 class="events-title"><?php _e( "Request Shoutout For", 'groupcalendar' ); ?> <?php echo date_i18n( get_option( 'date_format' ), strtotime( $day ) ); ?>
 						:</h5>
 					<?php bp_group_calendar_list_events( $bp->groups->current_group->id, 'day', $day, $calendar_capabilities ); ?>
 				</td>
@@ -2118,7 +2121,7 @@ function bp_group_calendar_widget_month( $date ) {
 					<?php print( $cal->output_calendar() ); ?>
 				</td>
 				<td class="cal-right">
-					<h5 class="events-title"><?php _e( 'Event Help Request For', 'groupcalendar' ); ?> <?php echo date_i18n( 'F Y', strtotime( $first_day ) ); ?>
+					<h5 class="events-title"><?php _e( 'Volunteer Shoutouts For', 'groupcalendar' ); ?> <?php echo date_i18n( 'F Y', strtotime( $first_day ) ); ?>
 						:</h5>
 					<?php bp_group_calendar_list_events( $bp->groups->current_group->id, 'month', $first_day, $calendar_capabilities ); ?>
 				</td>
@@ -2175,7 +2178,8 @@ function bp_group_calendar_widget_year( $date ) {
 		?>
 		<div class="clear"></div>
 	</div>
-	<?php
+
+<?php
 }
 
 function bp_group_calendar_widget_upcoming_events() {
@@ -2184,12 +2188,15 @@ function bp_group_calendar_widget_upcoming_events() {
 	$calendar_capabilities = bp_group_calendar_get_capabilities();
 
 	?>
+<!--
 	<div class="bp-widget">
-		<h4><?php _e( 'Upcoming Events', 'groupcalendar' ); ?></h4>
+		<h4><?php _e( 'UPCOMING SHOUTOUTS', 'groupcalendar' ); ?></h4>
 		<?php bp_group_calendar_list_events( $bp->groups->current_group->id, 'upcoming', '', $calendar_capabilities ); ?>
 	</div>
+-->
 	<?php
 }
+
 
 function bp_group_calendar_widget_my_events() {
 	global $bp;
@@ -2201,10 +2208,12 @@ function bp_group_calendar_widget_my_events() {
 	$calendar_capabilities = bp_group_calendar_get_capabilities();
 
 	?>
+
 	<div class="bp-widget">
-		<h4><?php _e( 'My Events', 'groupcalendar' ); ?></h4>
+		<h4><?php _e( 'MY SHOUTOUTS', 'groupcalendar' ); ?></h4>
 		<?php bp_group_calendar_list_events( $bp->groups->current_group->id, 'mine', '', $calendar_capabilities ); ?>
 	</div>
+
 	<?php
 }
 
@@ -2234,10 +2243,10 @@ function bp_group_calendar_widget_create_event( $date ) {
 
 	?>
 	<div class="bp-widget">
-		<h4><?php _e( 'Create Event Help Request', 'groupcalendar' ); ?></h4>
-		<?php _e( 'STEP 1: Add an event.  STEP 2: Get helpers.', 'groupcalendar' ); ?>
+		<h4><?php _e( 'CREATE SHOUTOUT REQUEST', 'groupcalendar' ); ?></h4>
+		<?php _e( '<b>STEP 1:</b> Add an event shoutout.  <b>STEP 2:</b> Get helpers.', 'groupcalendar' ); ?>
 </br>
-		<?php _e( 'This tool sends the event to Cause DuGoodrs and shares on social media.  People can then sign up for tasks and automatically get recognition on their timeline for participating.  Try it out!', 'groupcalendar' ); ?>
+		<?php _e( 'This tool helps you sign up DuGoodrs for tasks, and automatically get recognition for their participation.  Try it out! Its FREE!', 'groupcalendar' ); ?>
 </br>&nbsp;</br>
 		<form action="<?php echo $url; ?>" name="add-event-form" id="add-event-form" class="standard-form" method="post"
 		      enctype="multipart/form-data">
@@ -2305,9 +2314,9 @@ function bp_group_calendar_widget_create_event( $date ) {
 			<input type="file" name="a21_image_upload" id="a21_image_upload" />
 			<br>
 			<br>
-			<h4><?php _e( 'Create Schedule', 'groupcalendar' ); ?></h4>
+			<h4><?php _e( 'CREATE VOLUNTEER SCHEDULE', 'groupcalendar' ); ?></h4>
 
-			<label for="total-volunteers"><?php _e( 'Total Event Volunteers Needed', 'groupcalendar' ); ?></label>
+			<label for="total-volunteers"><?php _e( 'Total Volunteers Needed for Event (*Remember to overestimate!)', 'groupcalendar' ); ?></label>
 			<input name="total-volunteers" id="total-volunteers" value="" type="text">
 
 			<label for="event_tasks"><?php _e( 'Event Tasks & Shifts', 'groupcalendar' ); ?></label>
@@ -2362,7 +2371,7 @@ function bp_group_calendar_widget_create_event( $date ) {
 				</div>
 			</div>
 			<br>
-			<label for="thank_you"><?php _e( 'Event Completion Thank-you Message (*this will appear on timeline when finished)', 'groupcalendar' ); ?></label>
+			<label for="thank_you"><?php _e( 'Event Completion Thank-you Message (*this message and image will appear on DuGoodrs timeline when finished)', 'groupcalendar' ); ?></label>
 			<!-- <input name="thank_you" id="thank_you" value="" type="text"> -->
 			<textarea name="thank_you" id="thank_you" cols="30" rows="10"></textarea>
 			<?php /**** a21 ******/?>
@@ -2372,7 +2381,7 @@ function bp_group_calendar_widget_create_event( $date ) {
 			<input name="group-id" id="group-id" value="<?php echo $bp->groups->current_group->id; ?>" type="hidden">
 			<?php wp_nonce_field( 'bp_group_calendar' ); ?>
 
-			<p><input value="<?php _e( 'Create Event Help Request', 'groupcalendar' ); ?> &raquo;" id="save" name="save"
+			<p><input value="<?php _e( 'Create Shoutout Request', 'groupcalendar' ); ?> &raquo;" id="save" name="save"
 			          type="submit"></p>
 
 		</form>
@@ -2744,7 +2753,7 @@ class BP_Group_Calendar_Widget extends WP_Widget {
 		} else {
 			?>
 			<div class="widget-error">
-				<?php _e( 'There are no upcoming group events.', 'groupcalendar' ) ?>
+				<?php _e( 'There are no upcoming shoutout events.', 'groupcalendar' ) ?>
 			</div>
 		<?php } ?>
 
